@@ -1,0 +1,20 @@
+// @ts-check
+import { defineConfig } from 'astro/config';
+
+import sitemap from '@astrojs/sitemap';
+import preact from '@astrojs/preact';
+import tailwindcss from '@tailwindcss/vite';
+
+import vercel from '@astrojs/vercel';
+
+// https://astro.build/config
+export default defineConfig({
+  site: 'https://humansourcer.com',
+  integrations: [sitemap(), preact()],
+
+  vite: {
+    plugins: [tailwindcss()]
+  },
+
+  adapter: vercel()
+});

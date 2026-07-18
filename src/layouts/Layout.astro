@@ -1,0 +1,60 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  canonicalPath: string; // e.g. "/" or "/providers/alignerr"
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const { title, description, canonicalPath, jsonLd } = Astro.props;
+const canonicalUrl = new URL(canonicalPath, Astro.site);
+const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonicalUrl} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    {jsonLdBlocks.map((block) => (
+      <script type="application/ld+json" set:html={JSON.stringify(block)} />
+    ))}
+  </head>
+  <body class="min-h-screen bg-white text-slate-900 antialiased">
+    <header class="border-b border-slate-200">
+      <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+        <a href="/" class="text-lg font-semibold tracking-tight">HumanSourcer</a>
+        <nav class="text-sm text-slate-600">
+          <a href="/" class="hover:text-slate-900">Expert networks</a>
+        </nav>
+      </div>
+    </header>
+    <main class="mx-auto max-w-6xl px-4 py-8">
+      <slot />
+    </main>
+    <footer class="mt-16 border-t border-slate-200">
+      <div class="mx-auto max-w-6xl px-4 py-8 text-sm text-slate-500">
+        <p>
+          HumanSourcer indexes publicly documented worker-facing access points for AI-training
+          networks. Every ownership and status claim links to its source. Not affiliated with any
+          listed provider.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

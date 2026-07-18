@@ -1,0 +1,20 @@
+# HumanSourcer
+
+> HumanSourcer is a directory of expert AI-training and evaluation networks
+> (e.g. Mercor, Alignerr, Vetto, Pareto). Each profile documents the actual
+> operating parent company, the worker-facing access point, domain
+> specialization, access model, geography, and ownership confidence — with a
+> cited evidence URL for every ownership and status claim.
+
+## Purpose
+
+This site helps AI researchers, data-labeling professionals, and subject-matter
+experts find and compare the worker-facing entry points for expert AI-training
+networks. It is not affiliated with any listed provider.
+
+## Key pages
+
+- /: full comparison directory of expert-tier AI-training networks, filterable
+  by domain, access model, and geography.
+
+Provider profile pages are listed in /sitemap-index.xml.

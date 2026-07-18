@@ -1,0 +1,125 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import {
+  accessModelCategory,
+  geographyScope,
+  statusCategory,
+  confidenceLevel,
+  ACCESS_MODEL_LABELS,
+  GEOGRAPHY_LABELS,
+  STATUS_LABELS,
+  DOMAIN_TAG_LABELS,
+} from '../../lib/taxonomy';
+import { organizationJsonLd } from '../../lib/jsonld';
+
+export async function getStaticPaths() {
+  const all = await getCollection('providers');
+  const experts = all.filter((p) => p.data.audienceTier === 'expert');
+  return experts.map((provider) => ({
+    params: { slug: provider.data.slug },
+    props: { provider },
+  }));
+}
+
+interface Props {
+  provider: CollectionEntry<'providers'>;
+}
+
+const { provider }: Props = Astro.props;
+const p = provider.data;
+
+const profileUrl = new URL(`/providers/${p.slug}`, Astro.site).toString();
+const jsonLd = organizationJsonLd(p, profileUrl);
+
+const title = `${p.workerBrand} — ${p.parentGroup} | HumanSourcer`;
+const description = `${p.workerBrand} is ${p.parentGroup}'s ${p.portalType.toLowerCase()}. ${p.typicalWork}`;
+
+const access = accessModelCategory(p.accessModel);
+const geo = geographyScope(p.geography);
+const status = statusCategory(p.status);
+const confidence = confidenceLevel(p.ownershipConfidence);
+---
+
+<Layout title={title} description={description} canonicalPath={`/providers/${p.slug}`} jsonLd={jsonLd}>
+  <a href="/" class="text-sm text-slate-500 hover:text-slate-800">&larr; All expert networks</a>
+
+  <div class="mt-4 flex items-start justify-between gap-4">
+    <div>
+      <div class="text-sm uppercase tracking-wide text-slate-400">{p.parentGroup}</div>
+      <h1 class="mt-1 text-3xl font-bold tracking-tight">{p.workerBrand}</h1>
+      <p class="mt-2 text-slate-600">{p.relationship}</p>
+    </div>
+    <span class="whitespace-nowrap rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">
+      {STATUS_LABELS[status]}
+    </span>
+  </div>
+
+  <div class="mt-8 grid gap-6 sm:grid-cols-2">
+    <div class="rounded-lg border border-slate-200 p-4">
+      <div class="text-xs uppercase tracking-wide text-slate-400">Portal type</div>
+      <div class="mt-1 font-medium">{p.portalType}</div>
+    </div>
+    <div class="rounded-lg border border-slate-200 p-4">
+      <div class="text-xs uppercase tracking-wide text-slate-400">Access model</div>
+      <div class="mt-1 font-medium">{ACCESS_MODEL_LABELS[access]}</div>
+      <div class="mt-1 text-sm text-slate-500">{p.accessModel}</div>
+    </div>
+    <div class="rounded-lg border border-slate-200 p-4">
+      <div class="text-xs uppercase tracking-wide text-slate-400">Geography</div>
+      <div class="mt-1 font-medium">{GEOGRAPHY_LABELS[geo]}</div>
+      <div class="mt-1 text-sm text-slate-500">{p.geography}</div>
+    </div>
+    <div class="rounded-lg border border-slate-200 p-4">
+      <div class="text-xs uppercase tracking-wide text-slate-400">Ownership confidence</div>
+      <div class="mt-1 font-medium capitalize">{confidence}</div>
+      <div class="mt-1 text-sm text-slate-500">{p.ownershipConfidence}</div>
+    </div>
+  </div>
+
+  <div class="mt-8">
+    <h2 class="text-sm uppercase tracking-wide text-slate-400">Typical work</h2>
+    <p class="mt-2 text-slate-700">{p.typicalWork}</p>
+  </div>
+
+  <div class="mt-6">
+    <h2 class="text-sm uppercase tracking-wide text-slate-400">Domains</h2>
+    <div class="mt-2 flex flex-wrap gap-2">
+      {p.domainTags.map((tag) => (
+        <span class="rounded bg-slate-100 px-2 py-1 text-sm text-slate-700">
+          {DOMAIN_TAG_LABELS[tag] ?? tag}
+        </span>
+      ))}
+    </div>
+  </div>
+
+  {p.notes && (
+    <div class="mt-6">
+      <h2 class="text-sm uppercase tracking-wide text-slate-400">Notes</h2>
+      <p class="mt-2 text-slate-700">{p.notes}</p>
+    </div>
+  )}
+
+  <div class="mt-10 flex flex-wrap items-center gap-4">
+    <a
+      href={`/go/${p.slug}`}
+      rel="nofollow sponsored"
+      class="rounded-md bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-700"
+    >
+      Visit {p.workerBrand} &rarr;
+    </a>
+    <span class="text-xs text-slate-400">Last checked {p.lastChecked.toISOString().slice(0, 10)}</span>
+  </div>
+
+  <div class="mt-10 border-t border-slate-200 pt-6 text-sm text-slate-500">
+    <h2 class="mb-2 font-semibold text-slate-700">Sources</h2>
+    <ul class="space-y-1">
+      <li>
+        Ownership/relationship: <a class="underline" href={p.relationshipEvidenceUrl} rel="nofollow">{p.relationshipEvidenceUrl}</a>
+      </li>
+      <li>
+        Status: <a class="underline" href={p.statusEvidenceUrl} rel="nofollow">{p.statusEvidenceUrl}</a>
+      </li>
+    </ul>
+  </div>
+</Layout>

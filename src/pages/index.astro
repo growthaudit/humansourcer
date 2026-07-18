@@ -1,0 +1,48 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProviderFilter from '../components/ProviderFilter';
+import { getCollection } from 'astro:content';
+import { accessModelCategory, geographyScope } from '../lib/taxonomy';
+import { itemListJsonLd } from '../lib/jsonld';
+
+const allProviders = await getCollection('providers');
+const experts = allProviders
+  .filter((p) => p.data.audienceTier === 'expert')
+  .sort((a, b) => a.data.workerBrand.localeCompare(b.data.workerBrand));
+
+const rows = experts.map((p) => ({
+  slug: p.data.slug,
+  workerBrand: p.data.workerBrand,
+  parentGroup: p.data.parentGroup,
+  typicalWork: p.data.typicalWork,
+  domainTags: p.data.domainTags,
+  accessModelCategory: accessModelCategory(p.data.accessModel),
+  geographyScope: geographyScope(p.data.geography),
+}));
+
+const listUrl = new URL('/', Astro.site).toString();
+const jsonLd = itemListJsonLd(
+  experts.map((p) => ({
+    name: p.data.workerBrand,
+    url: new URL(`/providers/${p.data.slug}`, Astro.site).toString(),
+  })),
+  listUrl
+);
+
+const title = 'Expert AI-Training Networks Directory | HumanSourcer';
+const description =
+  'Compare expert AI-training and evaluation networks like Mercor, Alignerr, and Vetto — domain focus, access model, geography, and ownership, each with a cited source.';
+---
+
+<Layout title={title} description={description} canonicalPath="/" jsonLd={jsonLd}>
+  <h1 class="text-3xl font-bold tracking-tight">Expert AI-training networks</h1>
+  <p class="mt-2 max-w-2xl text-slate-600">
+    {experts.length} expert-tier networks that recruit domain specialists — lawyers, physicians,
+    engineers, linguists — to train and evaluate AI models. Filter by domain, access model, and
+    geography. Every ownership and status claim links to its public source.
+  </p>
+
+  <div class="mt-8">
+    <ProviderFilter providers={rows} client:load />
+  </div>
+</Layout>
