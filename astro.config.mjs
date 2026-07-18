@@ -9,7 +9,7 @@ import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://humansourcer.com',
+  site: 'https://www.humansourcer.com',
   integrations: [sitemap(), preact()],
 
   vite: {
