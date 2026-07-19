@@ -12,21 +12,24 @@ import {
   DOMAIN_TAG_LABELS,
 } from '../../lib/taxonomy';
 import { organizationJsonLd } from '../../lib/jsonld';
+import { getActiveRolesByProvider, type Role } from '../../lib/roles';
 
 export async function getStaticPaths() {
   const all = await getCollection('providers');
   const experts = all.filter((p) => p.data.audienceTier === 'expert');
+  const rolesByProvider = await getActiveRolesByProvider();
   return experts.map((provider) => ({
     params: { slug: provider.data.slug },
-    props: { provider },
+    props: { provider, roles: rolesByProvider.get(provider.data.slug) ?? [] },
   }));
 }
 
 interface Props {
   provider: CollectionEntry<'providers'>;
+  roles: Role[];
 }
 
-const { provider }: Props = Astro.props;
+const { provider, roles }: Props = Astro.props;
 const p = provider.data;
 
 const profileUrl = new URL(`/providers/${p.slug}`, Astro.site).toString();
@@ -110,6 +113,34 @@ const confidence = confidenceLevel(p.ownershipConfidence);
     </a>
     <span class="text-xs text-slate-400">Last checked {p.lastChecked.toISOString().slice(0, 10)}</span>
   </div>
+
+  {roles.length > 0 && (
+    <div class="mt-10">
+      <h2 class="text-sm uppercase tracking-wide text-slate-400">
+        Open roles ({roles.length})
+      </h2>
+      <div class="mt-3 space-y-3">
+        {roles.map((role) => (
+          <a
+            href={role.apply_url}
+            rel="nofollow sponsored"
+            class="block rounded-lg border border-slate-200 p-4 transition hover:border-slate-400 hover:shadow-sm"
+          >
+            <div class="flex items-start justify-between gap-4">
+              <div class="font-medium">{role.title}</div>
+              {role.pay_text && (
+                <span class="whitespace-nowrap text-sm text-slate-500">{role.pay_text}</span>
+              )}
+            </div>
+            <div class="mt-1 flex flex-wrap gap-2 text-xs text-slate-500">
+              {role.category && <span>{role.category}</span>}
+              {role.location && <span>&middot; {role.location}</span>}
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  )}
 
   <div class="mt-10 border-t border-slate-200 pt-6 text-sm text-slate-500">
     <h2 class="mb-2 font-semibold text-slate-700">Sources</h2>
