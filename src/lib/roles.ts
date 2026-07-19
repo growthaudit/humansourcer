@@ -1,8 +1,12 @@
-// Build-time only: reads scraped roles from Supabase using the service role
-// key. Never import this from a client island — it must not reach the browser
-// bundle. Roles render inline on existing provider pages rather than getting
-// their own indexable URLs (see Phase 2 plan: avoids crawl-budget dilution
-// and thin/duplicate-content risk from thousands of ephemeral listing pages).
+// Build-time only: reads scraped roles from Supabase using the publishable
+// key (auto-injected by Vercel's Supabase integration as
+// NEXT_PUBLIC_STORAGE_SUPABASE_URL / STORAGE_SUPABASE_PUBLISHABLE_KEY). Safe
+// to use here since RLS only exposes is_active=true rows to that key — see
+// the "public can read active roles" policy. Writes (the scrape scripts) use
+// the service_role key instead, kept in .env.local only, never in Vercel.
+// Roles render inline on existing provider pages rather than getting their
+// own indexable URLs (see Phase 2 plan: avoids crawl-budget dilution and
+// thin/duplicate-content risk from thousands of ephemeral listing pages).
 
 import { createClient } from '@supabase/supabase-js';
 
@@ -17,8 +21,8 @@ export interface Role {
 }
 
 export async function getActiveRolesByProvider(): Promise<Map<string, Role[]>> {
-  const url = import.meta.env.SUPABASE_URL;
-  const key = import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
+  const url = import.meta.env.NEXT_PUBLIC_STORAGE_SUPABASE_URL ?? import.meta.env.SUPABASE_URL;
+  const key = import.meta.env.STORAGE_SUPABASE_PUBLISHABLE_KEY ?? import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
   const byProvider = new Map<string, Role[]>();
 
   if (!url || !key) {
