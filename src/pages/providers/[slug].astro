@@ -12,7 +12,7 @@ import {
   DOMAIN_TAG_LABELS,
 } from '../../lib/taxonomy';
 import { organizationJsonLd } from '../../lib/jsonld';
-import { getActiveRolesByProvider, type Role } from '../../lib/roles';
+import { getActiveRolesByProvider, type ProviderRoles } from '../../lib/roles';
 
 export async function getStaticPaths() {
   const all = await getCollection('providers');
@@ -20,16 +20,20 @@ export async function getStaticPaths() {
   const rolesByProvider = await getActiveRolesByProvider();
   return experts.map((provider) => ({
     params: { slug: provider.data.slug },
-    props: { provider, roles: rolesByProvider.get(provider.data.slug) ?? [] },
+    props: {
+      provider,
+      providerRoles: rolesByProvider.get(provider.data.slug) ?? { roles: [], totalCount: 0 },
+    },
   }));
 }
 
 interface Props {
   provider: CollectionEntry<'providers'>;
-  roles: Role[];
+  providerRoles: ProviderRoles;
 }
 
-const { provider, roles }: Props = Astro.props;
+const { provider, providerRoles }: Props = Astro.props;
+const { roles, totalCount } = providerRoles;
 const p = provider.data;
 
 const profileUrl = new URL(`/providers/${p.slug}`, Astro.site).toString();
@@ -117,8 +121,16 @@ const confidence = confidenceLevel(p.ownershipConfidence);
   {roles.length > 0 && (
     <div class="mt-10">
       <h2 class="text-sm uppercase tracking-wide text-slate-400">
-        Open roles ({roles.length})
+        Open roles
+        {totalCount > roles.length
+          ? ` (showing ${roles.length} of ${totalCount})`
+          : ` (${totalCount})`}
       </h2>
+      {totalCount > roles.length && (
+        <p class="mt-1 text-xs text-slate-400">
+          Showing the most recently updated roles. Visit {provider.data.workerBrand} directly for the full list.
+        </p>
+      )}
       <div class="mt-3 space-y-3">
         {roles.map((role) => (
           <a
