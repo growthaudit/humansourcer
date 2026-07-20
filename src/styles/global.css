@@ -60,10 +60,16 @@
 
   --color-ink-primary: #f3f1eb;
   --color-ink-secondary: #98959f;
-  --color-ink-tertiary: #5e5b64;
+  /* #5e5b64 (original sample) only hit 3.0:1 on --color-bg, failing WCAG
+     AA (4.5:1) for the normal-size text it's used on (eyebrow labels,
+     breadcrumbs, meta text) — lightened to clear it with margin. */
+  --color-ink-tertiary: #7d7986;
 
   --color-accent: #653ce2;
-  --color-accent-hover: #8564e8;
+  /* Original #8564e8 dropped text-accent-ink's contrast on the CTA
+     buttons to 3.8:1 on hover, below AA — capped the lightening so it
+     stays >=4.5:1 while still reading as a lighter hover state. */
+  --color-accent-hover: #7752e5;
   --color-accent-active: #431cba;
   --color-accent-soft: rgb(101 60 226 / 0.14);
   --color-accent-soft-strong: rgb(101 60 226 / 0.28);
