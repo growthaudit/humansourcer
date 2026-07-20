@@ -22,6 +22,12 @@ const scrapers = [
   'scrape-mindrift.mjs',
   'scrape-g2i.mjs',
   'scrape-mercor.mjs',
+  'scrape-surge.mjs',
+  'scrape-hfc.mjs',
+  'scrape-sme.mjs',
+  'scrape-imerit.mjs',
+  'scrape-micro1.mjs',
+  'scrape-handshake.mjs',
 ];
 
 let failures = 0;
