@@ -8,7 +8,7 @@ import ProviderDetail from '../../components/ProviderDetail.astro';
 
 export async function getStaticPaths() {
   const all = await getCollection('providers');
-  const experts = all.filter((p) => p.data.audienceTier === 'expert');
+  const experts = all.filter((p) => p.data.audienceTiers[0] === 'expert');
   const rolesByProvider = await getActiveRolesByProvider();
   return experts.map((provider) => ({
     params: { slug: provider.data.slug },

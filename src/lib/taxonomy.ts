@@ -184,7 +184,7 @@ export const STATUS_LABELS: Record<StatusCategory, string> = {
 
 export const DOMAIN_TAG_LABELS: Record<string, string> = {
   law: 'Law',
-  medicine: 'Medicine',
+  medicine: 'Healthcare',
   finance: 'Finance',
   coding: 'Coding',
   'science-stem': 'Science / STEM',
@@ -195,4 +195,5 @@ export const DOMAIN_TAG_LABELS: Record<string, string> = {
   'voice-speech': 'Voice / Speech',
   generalist: 'Generalist',
   'reasoning-agent': 'Reasoning / Agents',
+  multimodal: 'Multimodal',
 };

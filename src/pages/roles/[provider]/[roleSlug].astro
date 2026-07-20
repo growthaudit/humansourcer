@@ -16,6 +16,7 @@ import {
   PAY_BAND_LABELS,
 } from '../../../lib/role-taxonomy';
 import { geographyScope, DOMAIN_TAG_LABELS } from '../../../lib/taxonomy';
+import { providerHref } from '../../../lib/provider-url';
 
 type Provider = CollectionEntry<'providers'>['data'];
 
@@ -23,7 +24,7 @@ export async function getStaticPaths() {
   const allRoles = await getAllRolesForPages();
   const providers = await getCollection('providers');
   const expertProviders = new Map(
-    providers.filter((p) => p.data.audienceTier === 'expert').map((p) => [p.data.slug, p.data])
+    providers.filter((p) => p.data.audienceTiers.includes('expert')).map((p) => [p.data.slug, p.data])
   );
   const eligibleRoles = allRoles.filter((r) => expertProviders.has(r.provider_slug));
 
@@ -60,7 +61,7 @@ const { role, provider, similarRoles }: Props = Astro.props;
 
 const path = rolePagePath(role);
 const roleUrl = new URL(path, Astro.site).toString();
-const providerUrl = new URL(`/providers/${provider.slug}`, Astro.site).toString();
+const providerUrl = new URL(providerHref(provider), Astro.site).toString();
 
 const breadcrumbItems = [
   { name: 'Home', url: new URL('/', Astro.site).toString() },

@@ -16,7 +16,7 @@ export interface ProviderRow {
   parentGroup: string;
   typicalWork: string;
   domainTags: string[];
-  audienceTier: AudienceTier;
+  audienceTiers: AudienceTier[];
   accessModelCategory: AccessModelCategory;
   geographyScope: GeographyScope;
 }
@@ -48,7 +48,7 @@ export default function ProviderFilter({ providers }: Props) {
 
   const filtered = useMemo(() => {
     let rows = providers.filter((p) => {
-      if (tier !== 'all' && p.audienceTier !== tier) return false;
+      if (tier !== 'all' && !p.audienceTiers.includes(tier as AudienceTier)) return false;
       if (domain !== 'all' && !p.domainTags.includes(domain)) return false;
       if (access !== 'all' && p.accessModelCategory !== access) return false;
       if (geo !== 'all' && p.geographyScope !== geo) return false;
@@ -136,7 +136,7 @@ export default function ProviderFilter({ providers }: Props) {
             <div class="flex items-center justify-between gap-2">
               <div class="text-xs uppercase tracking-wide text-slate-400">{p.parentGroup}</div>
               <span class="whitespace-nowrap rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-500">
-                {TIER_LABELS[p.audienceTier]}
+                {p.audienceTiers.map((t) => TIER_LABELS[t]).join(' + ')}
               </span>
             </div>
             <div class="mt-1 font-semibold">{p.workerBrand}</div>

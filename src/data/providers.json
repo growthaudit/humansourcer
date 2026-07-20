@@ -6,7 +6,7 @@
     "workerBrand": "Surge Workforce",
     "relationship": "Direct Surge expert workforce",
     "portalType": "Expert network",
-    "audienceTier": "expert",
+    "audienceTiers": ["expert"],
     "domainTags": [
       "generalist"
     ],
@@ -28,7 +28,7 @@
     "workerBrand": "DataAnnotation",
     "relationship": "Reported worker-facing operating brand",
     "portalType": "Task marketplace",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "law",
       "medicine",
@@ -71,7 +71,7 @@
     "workerBrand": "Outlier",
     "relationship": "Scale-operated contributor platform",
     "portalType": "Task marketplace",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "coding",
       "science-stem",
@@ -96,7 +96,7 @@
     "workerBrand": "Remotasks",
     "relationship": "Scale-operated contributor platform",
     "portalType": "Task marketplace",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "generalist"
     ],
@@ -118,7 +118,7 @@
     "workerBrand": "Human Frontier Collective (HFC)",
     "relationship": "Scale fellowship / expert network",
     "portalType": "Selective fellowship",
-    "audienceTier": "expert",
+    "audienceTiers": ["expert"],
     "domainTags": [
       "law",
       "medicine",
@@ -143,7 +143,7 @@
     "workerBrand": "Alignerr",
     "relationship": "Labelbox expert network",
     "portalType": "Expert network",
-    "audienceTier": "expert",
+    "audienceTiers": ["expert"],
     "domainTags": [
       "coding",
       "writing-creative"
@@ -166,7 +166,7 @@
     "workerBrand": "Mindrift",
     "relationship": "Toloka contributor work migrated to Mindrift",
     "portalType": "Expert / task network",
-    "audienceTier": "expert",
+    "audienceTiers": ["expert"],
     "domainTags": [
       "coding",
       "linguistics",
@@ -199,7 +199,7 @@
     "workerBrand": "Meridial",
     "relationship": "Invisible-powered expert contractor network",
     "portalType": "Expert network",
-    "audienceTier": "expert",
+    "audienceTiers": ["expert"],
     "domainTags": [
       "law",
       "finance",
@@ -226,7 +226,7 @@
     "workerBrand": "CrowdGen",
     "relationship": "Appen contributor platform",
     "portalType": "Task marketplace",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "linguistics",
       "voice-speech"
@@ -265,7 +265,7 @@
     "workerBrand": "TELUS International AI Community portal",
     "relationship": "TELUS worker portal",
     "portalType": "Task marketplace",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "safety"
     ],
@@ -296,7 +296,7 @@
     "workerBrand": "AI Community jobs board",
     "relationship": "TELUS careers category",
     "portalType": "Jobs board",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "generalist"
     ],
@@ -327,7 +327,7 @@
     "workerBrand": "OneForma",
     "relationship": "Centific contributor platform",
     "portalType": "Task marketplace",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "linguistics",
       "voice-speech"
@@ -359,7 +359,7 @@
     "workerBrand": "DataForce Community",
     "relationship": "TransPerfect AI-data community",
     "portalType": "Community / marketplace",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "generalist"
     ],
@@ -381,7 +381,7 @@
     "workerBrand": "DataForce jobs",
     "relationship": "TransPerfect community jobs board",
     "portalType": "Jobs board",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "linguistics"
     ],
@@ -403,7 +403,7 @@
     "workerBrand": "TrainAI Community",
     "relationship": "RWS AI-data contributor community",
     "portalType": "Community / marketplace",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "generalist"
     ],
@@ -425,7 +425,7 @@
     "workerBrand": "Welo Data",
     "relationship": "Welocalize AI-data community",
     "portalType": "Community / marketplace",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "linguistics",
       "safety"
@@ -448,7 +448,7 @@
     "workerBrand": "Neevo",
     "relationship": "Defined.ai crowd platform",
     "portalType": "Task marketplace",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "generalist"
     ],
@@ -470,7 +470,7 @@
     "workerBrand": "Clickworker",
     "relationship": "LXT-owned crowd platform",
     "portalType": "Task marketplace",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "voice-speech"
     ],
@@ -492,7 +492,7 @@
     "workerBrand": "SME Careers",
     "relationship": "SuperAnnotate expert-work portal",
     "portalType": "Expert network",
-    "audienceTier": "expert",
+    "audienceTiers": ["expert"],
     "domainTags": [
       "generalist"
     ],
@@ -514,7 +514,7 @@
     "workerBrand": "Mercor Experts",
     "relationship": "Direct expert network",
     "portalType": "Expert network",
-    "audienceTier": "expert",
+    "audienceTiers": ["expert"],
     "domainTags": [
       "law",
       "medicine",
@@ -540,7 +540,7 @@
     "workerBrand": "micro1 Experts Opportunities",
     "relationship": "Direct expert network",
     "portalType": "Expert network",
-    "audienceTier": "expert",
+    "audienceTiers": ["expert"],
     "domainTags": [
       "writing-creative"
     ],
@@ -562,7 +562,7 @@
     "workerBrand": "AfterQuery Experts",
     "relationship": "Direct expert network",
     "portalType": "Expert network",
-    "audienceTier": "expert",
+    "audienceTiers": ["expert"],
     "domainTags": [
       "writing-creative",
       "reasoning-agent"
@@ -585,7 +585,7 @@
     "workerBrand": "Handshake AI",
     "relationship": "Handshake AI fellowship / opportunity network",
     "portalType": "Expert network",
-    "audienceTier": "expert",
+    "audienceTiers": ["expert"],
     "domainTags": [
       "generalist"
     ],
@@ -607,9 +607,14 @@
     "workerBrand": "Prolific Participants",
     "relationship": "Direct participant marketplace",
     "portalType": "Research participant marketplace",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig", "expert"],
     "domainTags": [
-      "generalist"
+      "generalist",
+      "coding",
+      "medicine",
+      "finance",
+      "linguistics",
+      "multimodal"
     ],
     "typicalWork": "Research studies, behavioural data and AI evaluation/training tasks",
     "workerUrl": "https://www.prolific.com/participants",
@@ -629,7 +634,7 @@
     "workerBrand": "Turing AI Advancement Work",
     "relationship": "Direct project marketplace",
     "portalType": "Expert / talent marketplace",
-    "audienceTier": "expert",
+    "audienceTiers": ["expert"],
     "domainTags": [
       "coding",
       "science-stem",
@@ -653,7 +658,7 @@
     "workerBrand": "Pareto Experts",
     "relationship": "Direct expert network",
     "portalType": "Expert network",
-    "audienceTier": "expert",
+    "audienceTiers": ["expert"],
     "domainTags": [
       "generalist"
     ],
@@ -675,7 +680,7 @@
     "workerBrand": "Stellar",
     "relationship": "Direct contributor platform",
     "portalType": "Task marketplace",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "generalist"
     ],
@@ -697,7 +702,7 @@
     "workerBrand": "Braintrust AI Training",
     "relationship": "AI-training category within talent marketplace",
     "portalType": "Talent marketplace",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "generalist"
     ],
@@ -719,7 +724,7 @@
     "workerBrand": "Deccan Experts",
     "relationship": "Direct expert network",
     "portalType": "Expert network",
-    "audienceTier": "expert",
+    "audienceTiers": ["expert"],
     "domainTags": [
       "generalist"
     ],
@@ -741,7 +746,7 @@
     "workerBrand": "Sapien Worker / Validator network",
     "relationship": "Direct contributor network",
     "portalType": "Waitlist / network",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "generalist"
     ],
@@ -763,7 +768,7 @@
     "workerBrand": "Data Annotation Contributor community",
     "relationship": "Direct campaign role",
     "portalType": "Campaign job listing",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "generalist"
     ],
@@ -785,7 +790,7 @@
     "workerBrand": "G2i Talent",
     "relationship": "Direct talent network",
     "portalType": "Technical expert network",
-    "audienceTier": "expert",
+    "audienceTiers": ["expert"],
     "domainTags": [
       "coding",
       "reasoning-agent"
@@ -808,7 +813,7 @@
     "workerBrand": "Sepal Expert Hub",
     "relationship": "Direct expert network",
     "portalType": "Expert jobs board",
-    "audienceTier": "expert",
+    "audienceTiers": ["expert"],
     "domainTags": [
       "generalist"
     ],
@@ -830,7 +835,7 @@
     "workerBrand": "Vetto Opportunities",
     "relationship": "Direct expert platform",
     "portalType": "Expert jobs board",
-    "audienceTier": "expert",
+    "audienceTiers": ["expert"],
     "domainTags": [
       "medicine",
       "finance",
@@ -854,7 +859,7 @@
     "workerBrand": "Shipd",
     "relationship": "Datacurve contributor platform",
     "portalType": "Technical contributor platform",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "coding"
     ],
@@ -876,7 +881,7 @@
     "workerBrand": "OpenTrain freelancer marketplace",
     "relationship": "Direct marketplace",
     "portalType": "Marketplace / aggregator",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "reasoning-agent"
     ],
@@ -898,7 +903,7 @@
     "workerBrand": "Alfons AI Talent Network",
     "relationship": "Direct talent network",
     "portalType": "Expert network",
-    "audienceTier": "expert",
+    "audienceTiers": ["expert"],
     "domainTags": [
       "generalist"
     ],
@@ -920,7 +925,7 @@
     "workerBrand": "Human Expert Network",
     "relationship": "Direct expert network",
     "portalType": "Expert jobs board",
-    "audienceTier": "expert",
+    "audienceTiers": ["expert"],
     "domainTags": [
       "linguistics",
       "safety",
@@ -944,7 +949,7 @@
     "workerBrand": "iMerit Scholars",
     "relationship": "iMerit expert network",
     "portalType": "Expert network",
-    "audienceTier": "expert",
+    "audienceTiers": ["expert"],
     "domainTags": [
       "generalist"
     ],
@@ -966,7 +971,7 @@
     "workerBrand": "AI 101",
     "relationship": "Sama training and recruitment route",
     "portalType": "Location-based programme",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "reasoning-agent"
     ],
@@ -988,7 +993,7 @@
     "workerBrand": "Data Specialist Careers",
     "relationship": "Direct managed-workforce recruitment",
     "portalType": "Managed workforce careers",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "generalist"
     ],
@@ -1010,7 +1015,7 @@
     "workerBrand": "TaskVerse",
     "relationship": "TaskUs crowd platform",
     "portalType": "Task marketplace",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "generalist"
     ],
@@ -1032,7 +1037,7 @@
     "workerBrand": "Hive Micro",
     "relationship": "Hive crowd platform",
     "portalType": "Microtask marketplace",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "generalist"
     ],
@@ -1054,7 +1059,7 @@
     "workerBrand": "Mechanical Turk",
     "relationship": "Amazon crowdsourcing marketplace",
     "portalType": "Microtask marketplace",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "generalist"
     ],
@@ -1076,7 +1081,7 @@
     "workerBrand": "Connect",
     "relationship": "CloudResearch participant platform",
     "portalType": "Research participant marketplace",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "generalist"
     ],
@@ -1098,7 +1103,7 @@
     "workerBrand": "Robson",
     "relationship": "Globalme-developed data-collection app now under Summa Linguae",
     "portalType": "Mobile task app",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "linguistics",
       "voice-speech"
@@ -1130,7 +1135,7 @@
     "workerBrand": "Datavio.ai",
     "relationship": "iSoftStone crowd platform; formerly Teemwork.ai",
     "portalType": "Jobs / task marketplace",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "linguistics"
     ],
@@ -1168,7 +1173,7 @@
     "workerBrand": "Shaip Careers",
     "relationship": "Direct company careers route",
     "portalType": "Managed workforce careers",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "generalist"
     ],
@@ -1190,7 +1195,7 @@
     "workerBrand": "Lionbridge AI freelance projects",
     "relationship": "Direct freelance route",
     "portalType": "Freelance jobs board",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "linguistics"
     ],
@@ -1212,7 +1217,7 @@
     "workerBrand": "Rex.zone",
     "relationship": "Direct contributor network",
     "portalType": "Expert jobs board",
-    "audienceTier": "expert",
+    "audienceTiers": ["expert"],
     "domainTags": [
       "safety",
       "writing-creative",
@@ -1237,7 +1242,7 @@
     "workerBrand": "DATAmundi freelance & vendor applications",
     "relationship": "Direct freelance/vendor route",
     "portalType": "Freelance application",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "linguistics",
       "consulting-ops"
@@ -1269,7 +1274,7 @@
     "workerBrand": "Aya Data Careers",
     "relationship": "Direct managed-workforce recruitment",
     "portalType": "Managed workforce careers",
-    "audienceTier": "gig",
+    "audienceTiers": ["gig"],
     "domainTags": [
       "consulting-ops"
     ],
@@ -1291,7 +1296,7 @@
     "workerBrand": "Karya",
     "relationship": "Direct Karya worker programme",
     "portalType": "Managed workforce",
-    "audienceTier": "restricted",
+    "audienceTiers": ["restricted"],
     "domainTags": [
       "generalist"
     ],
@@ -1313,7 +1318,7 @@
     "workerBrand": "Humans in the Loop",
     "relationship": "Direct Humans in the Loop worker programme",
     "portalType": "Managed workforce",
-    "audienceTier": "restricted",
+    "audienceTiers": ["restricted"],
     "domainTags": [
       "generalist"
     ],
@@ -1335,7 +1340,7 @@
     "workerBrand": "Innodata",
     "relationship": "Direct Innodata corporate hiring",
     "portalType": "Managed workforce",
-    "audienceTier": "restricted",
+    "audienceTiers": ["restricted"],
     "domainTags": [
       "generalist"
     ],
@@ -1357,7 +1362,7 @@
     "workerBrand": "Cogito Tech",
     "relationship": "Direct Cogito Tech corporate hiring",
     "portalType": "Managed workforce",
-    "audienceTier": "restricted",
+    "audienceTiers": ["restricted"],
     "domainTags": [
       "generalist"
     ],
@@ -1379,7 +1384,7 @@
     "workerBrand": "Anolytics",
     "relationship": "Direct Anolytics corporate hiring",
     "portalType": "Managed workforce",
-    "audienceTier": "restricted",
+    "audienceTiers": ["restricted"],
     "domainTags": [
       "generalist"
     ],
@@ -1401,7 +1406,7 @@
     "workerBrand": "e2f",
     "relationship": "Direct e2f corporate/campaign hiring",
     "portalType": "Managed workforce",
-    "audienceTier": "restricted",
+    "audienceTiers": ["restricted"],
     "domainTags": [
       "linguistics",
       "generalist"
@@ -1424,7 +1429,7 @@
     "workerBrand": "Kili Technology",
     "relationship": "Direct Kili Technology corporate hiring",
     "portalType": "Annotation software plus managed services",
-    "audienceTier": "restricted",
+    "audienceTiers": ["restricted"],
     "domainTags": [
       "generalist"
     ],
@@ -1446,7 +1451,7 @@
     "workerBrand": "Encord",
     "relationship": "Direct Encord corporate hiring",
     "portalType": "Annotation software plus services",
-    "audienceTier": "restricted",
+    "audienceTiers": ["restricted"],
     "domainTags": [
       "generalist"
     ],
@@ -1468,7 +1473,7 @@
     "workerBrand": "V7",
     "relationship": "Direct V7 corporate hiring",
     "portalType": "Annotation software plus services",
-    "audienceTier": "restricted",
+    "audienceTiers": ["restricted"],
     "domainTags": [
       "generalist"
     ],
@@ -1490,7 +1495,7 @@
     "workerBrand": "Scale Rapid / Enterprise managed services",
     "relationship": "Scale AI enterprise managed-services and corporate hiring arm",
     "portalType": "Managed workforce",
-    "audienceTier": "restricted",
+    "audienceTiers": ["restricted"],
     "domainTags": [
       "generalist"
     ],

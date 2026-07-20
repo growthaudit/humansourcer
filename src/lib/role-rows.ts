@@ -20,7 +20,7 @@ export interface RoleWithProvider {
 export async function getEligibleActiveRoles(): Promise<RoleWithProvider[]> {
   const [allRoles, providers] = await Promise.all([getAllRolesForPages(), getCollection('providers')]);
   const expertProviders = new Map(
-    providers.filter((p) => p.data.audienceTier === 'expert').map((p) => [p.data.slug, p.data])
+    providers.filter((p) => p.data.audienceTiers.includes('expert')).map((p) => [p.data.slug, p.data])
   );
   const result: RoleWithProvider[] = [];
   for (const role of allRoles) {

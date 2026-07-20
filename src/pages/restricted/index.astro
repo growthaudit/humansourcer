@@ -2,17 +2,18 @@
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 import { itemListJsonLd } from '../../lib/jsonld';
+import { providerHref } from '../../lib/provider-url';
 
 const allProviders = await getCollection('providers');
 const restricted = allProviders
-  .filter((p) => p.data.audienceTier === 'restricted')
+  .filter((p) => p.data.audienceTiers.includes('restricted'))
   .sort((a, b) => a.data.workerBrand.localeCompare(b.data.workerBrand));
 
 const listUrl = new URL('/restricted/', Astro.site).toString();
 const jsonLd = itemListJsonLd(
   restricted.map((p) => ({
     name: p.data.workerBrand,
-    url: new URL(`/restricted/${p.data.slug}`, Astro.site).toString(),
+    url: new URL(providerHref(p.data), Astro.site).toString(),
   })),
   listUrl
 );
@@ -39,7 +40,7 @@ const description =
   <div class="mt-8 grid gap-4 sm:grid-cols-2">
     {restricted.map((p) => (
       <a
-        href={`/restricted/${p.data.slug}`}
+        href={providerHref(p.data)}
         class="block rounded-lg border border-slate-200 p-4 transition hover:border-slate-400 hover:shadow-sm"
       >
         <div class="text-xs uppercase tracking-wide text-slate-400">{p.data.parentGroup}</div>

@@ -9,19 +9,21 @@
 import Layout from '../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 import { accessModelCategory, ACCESS_MODEL_LABELS, DOMAIN_TAG_LABELS } from '../lib/taxonomy';
+import { providerHref } from '../lib/provider-url';
 import { getActiveRolesByProvider } from '../lib/roles';
 import { itemListJsonLd, faqPageJsonLd, breadcrumbListJsonLd } from '../lib/jsonld';
 import FAQ from '../components/FAQ.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 
 const allProviders = await getCollection('providers');
-const experts = allProviders.filter((p) => p.data.audienceTier === 'expert');
+const experts = allProviders.filter((p) => p.data.audienceTiers.includes('expert'));
 const rolesByProvider = await getActiveRolesByProvider();
 
 const openAccess = experts
   .filter((p) => accessModelCategory(p.data.accessModel) === 'open')
   .map((p) => ({
     slug: p.data.slug,
+    href: providerHref(p.data),
     workerBrand: p.data.workerBrand,
     parentGroup: p.data.parentGroup,
     typicalWork: p.data.typicalWork,
@@ -64,7 +66,7 @@ const faqs = [
 const jsonLd = [
   breadcrumbListJsonLd(breadcrumbItems),
   itemListJsonLd(
-    openAccess.map((p) => ({ name: p.workerBrand, url: new URL(`/providers/${p.slug}`, Astro.site).toString() })),
+    openAccess.map((p) => ({ name: p.workerBrand, url: new URL(p.href, Astro.site).toString() })),
     pageUrl
   ),
   faqPageJsonLd(faqs),
@@ -90,7 +92,7 @@ const description = `${openAccess.length} AI-training networks with open, self-s
       <p class="mt-1 text-sm text-slate-500">Open registration and non-specialist work — no professional credential expected.</p>
       <div class="mt-4 grid gap-4 sm:grid-cols-2">
         {generalistPicks.map((p) => (
-          <a href={`/providers/${p.slug}`} class="block rounded-lg border border-slate-200 p-4 transition hover:border-slate-400 hover:shadow-sm">
+          <a href={p.href} class="block rounded-lg border border-slate-200 p-4 transition hover:border-slate-400 hover:shadow-sm">
             <div class="text-xs uppercase tracking-wide text-slate-400">{p.parentGroup}</div>
             <div class="mt-1 font-medium">{p.workerBrand}</div>
             <p class="mt-1 text-sm text-slate-600">{p.typicalWork}</p>
@@ -111,7 +113,7 @@ const description = `${openAccess.length} AI-training networks with open, self-s
       </p>
       <div class="mt-4 grid gap-4 sm:grid-cols-2">
         {domainSpecificPicks.map((p) => (
-          <a href={`/providers/${p.slug}`} class="block rounded-lg border border-slate-200 p-4 transition hover:border-slate-400 hover:shadow-sm">
+          <a href={p.href} class="block rounded-lg border border-slate-200 p-4 transition hover:border-slate-400 hover:shadow-sm">
             <div class="text-xs uppercase tracking-wide text-slate-400">{p.parentGroup}</div>
             <div class="mt-1 font-medium">{p.workerBrand}</div>
             <p class="mt-1 text-sm text-slate-600">{p.typicalWork}</p>

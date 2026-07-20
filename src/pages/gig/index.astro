@@ -3,19 +3,22 @@ import Layout from '../../layouts/Layout.astro';
 import ProviderFilter from '../../components/ProviderFilter';
 import { getCollection } from 'astro:content';
 import { accessModelCategory, geographyScope } from '../../lib/taxonomy';
+import { providerHref } from '../../lib/provider-url';
 import { itemListJsonLd } from '../../lib/jsonld';
 
 const allProviders = await getCollection('providers');
 const gigs = allProviders
-  .filter((p) => p.data.audienceTier === 'gig')
+  .filter((p) => p.data.audienceTiers.includes('gig'))
   .sort((a, b) => a.data.workerBrand.localeCompare(b.data.workerBrand));
 
 const rows = gigs.map((p) => ({
   slug: p.data.slug,
+  href: providerHref(p.data),
   workerBrand: p.data.workerBrand,
   parentGroup: p.data.parentGroup,
   typicalWork: p.data.typicalWork,
   domainTags: p.data.domainTags,
+  audienceTiers: p.data.audienceTiers,
   accessModelCategory: accessModelCategory(p.data.accessModel),
   geographyScope: geographyScope(p.data.geography),
 }));
@@ -24,7 +27,7 @@ const listUrl = new URL('/gig/', Astro.site).toString();
 const jsonLd = itemListJsonLd(
   gigs.map((p) => ({
     name: p.data.workerBrand,
-    url: new URL(`/gig/${p.data.slug}`, Astro.site).toString(),
+    url: new URL(providerHref(p.data), Astro.site).toString(),
   })),
   listUrl
 );

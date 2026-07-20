@@ -23,7 +23,7 @@ const AUDIENCE_TIERS = ['expert', 'gig', 'restricted'] as const;
 const DOMAIN_TAGS = [
   'law', 'medicine', 'finance', 'coding', 'science-stem', 'linguistics',
   'safety', 'writing-creative', 'consulting-ops', 'voice-speech',
-  'generalist', 'reasoning-agent',
+  'generalist', 'reasoning-agent', 'multimodal',
 ] as const;
 
 const providerSchema = z.object({
@@ -33,7 +33,7 @@ const providerSchema = z.object({
   workerBrand: z.string(),           // e.g. "Alignerr" — the worker-facing name
   relationship: z.string(),          // plain-English description of parent<->brand link
   portalType: z.string(),            // free-text type as sourced, e.g. "Expert network"
-  audienceTier: z.enum(AUDIENCE_TIERS), // drives nav/sitemap priority — not inferred at render time
+  audienceTiers: z.array(z.enum(AUDIENCE_TIERS)).min(1), // first entry is the primary/canonical route
   domainTags: z.array(z.enum(DOMAIN_TAGS)).min(1),
   typicalWork: z.string(),
   workerUrl: z.string().url(),       // outbound application URL — the click-tracking target

@@ -7,7 +7,7 @@ import ProviderDetail from '../../components/ProviderDetail.astro';
 
 export async function getStaticPaths() {
   const all = await getCollection('providers');
-  const restricted = all.filter((p) => p.data.audienceTier === 'restricted');
+  const restricted = all.filter((p) => p.data.audienceTiers[0] === 'restricted');
   return restricted.map((provider) => ({
     params: { slug: provider.data.slug },
     props: { provider },
