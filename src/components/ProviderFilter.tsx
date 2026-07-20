@@ -7,12 +7,16 @@ import {
   type GeographyScope,
 } from '../lib/taxonomy';
 
+export type AudienceTier = 'expert' | 'gig' | 'restricted';
+
 export interface ProviderRow {
   slug: string;
+  href: string; // tier-specific detail URL: /providers/{slug}, /gig/{slug}, or /restricted/{slug}
   workerBrand: string;
   parentGroup: string;
   typicalWork: string;
   domainTags: string[];
+  audienceTier: AudienceTier;
   accessModelCategory: AccessModelCategory;
   geographyScope: GeographyScope;
 }
@@ -23,7 +27,14 @@ interface Props {
 
 type SortKey = 'name' | 'parent';
 
+const TIER_LABELS: Record<AudienceTier, string> = {
+  expert: 'Expert',
+  gig: 'Gig',
+  restricted: 'Restricted',
+};
+
 export default function ProviderFilter({ providers }: Props) {
+  const [tier, setTier] = useState<string>('all');
   const [domain, setDomain] = useState<string>('all');
   const [access, setAccess] = useState<string>('all');
   const [geo, setGeo] = useState<string>('all');
@@ -37,6 +48,7 @@ export default function ProviderFilter({ providers }: Props) {
 
   const filtered = useMemo(() => {
     let rows = providers.filter((p) => {
+      if (tier !== 'all' && p.audienceTier !== tier) return false;
       if (domain !== 'all' && !p.domainTags.includes(domain)) return false;
       if (access !== 'all' && p.accessModelCategory !== access) return false;
       if (geo !== 'all' && p.geographyScope !== geo) return false;
@@ -47,11 +59,23 @@ export default function ProviderFilter({ providers }: Props) {
       return a[key].localeCompare(b[key]);
     });
     return rows;
-  }, [providers, domain, access, geo, sort]);
+  }, [providers, tier, domain, access, geo, sort]);
 
   return (
     <div>
       <div class="mb-6 flex flex-wrap gap-3">
+        <select
+          class="rounded border border-slate-300 px-3 py-2 text-sm"
+          value={tier}
+          onChange={(e) => setTier((e.target as HTMLSelectElement).value)}
+          aria-label="Filter by tier"
+        >
+          <option value="all">All tiers</option>
+          {Object.entries(TIER_LABELS).map(([value, label]) => (
+            <option value={value}>{label}</option>
+          ))}
+        </select>
+
         <select
           class="rounded border border-slate-300 px-3 py-2 text-sm"
           value={domain}
@@ -106,10 +130,15 @@ export default function ProviderFilter({ providers }: Props) {
       <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.map((p) => (
           <a
-            href={`/providers/${p.slug}`}
+            href={p.href}
             class="block rounded-lg border border-slate-200 p-4 transition hover:border-slate-400 hover:shadow-sm"
           >
-            <div class="text-xs uppercase tracking-wide text-slate-400">{p.parentGroup}</div>
+            <div class="flex items-center justify-between gap-2">
+              <div class="text-xs uppercase tracking-wide text-slate-400">{p.parentGroup}</div>
+              <span class="whitespace-nowrap rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-500">
+                {TIER_LABELS[p.audienceTier]}
+              </span>
+            </div>
             <div class="mt-1 font-semibold">{p.workerBrand}</div>
             <p class="mt-2 line-clamp-2 text-sm text-slate-600">{p.typicalWork}</p>
             <div class="mt-3 flex flex-wrap gap-1">

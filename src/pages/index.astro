@@ -1,45 +1,58 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import ProviderFilter from '../components/ProviderFilter';
+import type { ProviderRow, AudienceTier } from '../components/ProviderFilter';
 import { getCollection } from 'astro:content';
 import { accessModelCategory, geographyScope } from '../lib/taxonomy';
 import { itemListJsonLd } from '../lib/jsonld';
 
-const allProviders = await getCollection('providers');
-const experts = allProviders
-  .filter((p) => p.data.audienceTier === 'expert')
-  .sort((a, b) => a.data.workerBrand.localeCompare(b.data.workerBrand));
+const TIER_HREF_PREFIX: Record<AudienceTier, string> = {
+  expert: '/providers/',
+  gig: '/gig/',
+  restricted: '/restricted/',
+};
 
-const rows = experts.map((p) => ({
+const allProviders = (await getCollection('providers')).sort((a, b) =>
+  a.data.workerBrand.localeCompare(b.data.workerBrand)
+);
+
+const rows: ProviderRow[] = allProviders.map((p) => ({
   slug: p.data.slug,
+  href: `${TIER_HREF_PREFIX[p.data.audienceTier]}${p.data.slug}`,
   workerBrand: p.data.workerBrand,
   parentGroup: p.data.parentGroup,
   typicalWork: p.data.typicalWork,
   domainTags: p.data.domainTags,
+  audienceTier: p.data.audienceTier,
   accessModelCategory: accessModelCategory(p.data.accessModel),
   geographyScope: geographyScope(p.data.geography),
 }));
 
+const expertCount = allProviders.filter((p) => p.data.audienceTier === 'expert').length;
+const gigCount = allProviders.filter((p) => p.data.audienceTier === 'gig').length;
+const restrictedCount = allProviders.filter((p) => p.data.audienceTier === 'restricted').length;
+
 const listUrl = new URL('/', Astro.site).toString();
 const jsonLd = itemListJsonLd(
-  experts.map((p) => ({
+  allProviders.map((p) => ({
     name: p.data.workerBrand,
-    url: new URL(`/providers/${p.data.slug}`, Astro.site).toString(),
+    url: new URL(`${TIER_HREF_PREFIX[p.data.audienceTier]}${p.data.slug}`, Astro.site).toString(),
   })),
   listUrl
 );
 
-const title = 'Expert AI-Training Networks Directory | HumanSourcer';
-const description =
-  'Compare expert AI-training and evaluation networks like Mercor, Alignerr, and Vetto — domain focus, access model, geography, and ownership, each with a cited source.';
+const title = 'AI-Training & Data-Annotation Provider Directory | HumanSourcer';
+const description = `Compare ${allProviders.length} AI-training and data-annotation providers — expert networks, gig/task platforms, and managed workforces like Mercor, Alignerr, DataAnnotation, and Outlier — domain focus, access model, geography, and ownership, each with a cited source.`;
 ---
 
 <Layout title={title} description={description} canonicalPath="/" jsonLd={jsonLd}>
-  <h1 class="text-3xl font-bold tracking-tight">Expert AI-training networks</h1>
+  <h1 class="text-3xl font-bold tracking-tight">AI-training &amp; data-annotation providers</h1>
   <p class="mt-2 max-w-2xl text-slate-600">
-    {experts.length} expert-tier networks that recruit domain specialists — lawyers, physicians,
-    engineers, linguists — to train and evaluate AI models. Filter by domain, access model, and
-    geography. Every ownership and status claim links to its public source.
+    {allProviders.length} providers across three tiers: {expertCount} expert networks that recruit
+    domain specialists (lawyers, physicians, engineers), {gigCount} gig/task platforms open to
+    anyone, and {restrictedCount} managed workforces with no public self-serve worker portal.
+    Filter by tier, domain, access model, and geography below — every ownership and status claim
+    links to its public source.
   </p>
   <p class="mt-2 max-w-2xl text-slate-600">
     Looking for open positions instead? <a href="/roles/" class="underline">Browse all open roles</a>,
@@ -49,12 +62,7 @@ const description =
     New here? See the <a href="/best-ai-training-platforms/" class="underline">best AI training platforms</a>
     ranked by ownership and open roles, or platforms with
     <a href="/no-experience-required/" class="underline">no experience required</a> to apply.
-  </p>
-  <p class="mt-2 max-w-2xl text-slate-600">
-    Not a domain expert? See <a href="/gig/" class="underline">gig &amp; task-based platforms</a> instead —
-    no specialist background required for most work. There's also a list of
-    <a href="/restricted/" class="underline">companies with no public self-serve worker portal</a>
-    (for completeness) and <a href="/other-ai-job-boards/" class="underline">other independent job boards</a>.
+    There's also a list of <a href="/other-ai-job-boards/" class="underline">other independent job boards</a>.
   </p>
 
   <div class="mt-8">
