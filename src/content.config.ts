@@ -47,6 +47,21 @@ const providerSchema = z.object({
   featured: z.boolean().default(false),   // paid-placement flag, wired up later via Supabase
   featuredRank: z.number().optional(),
   verified: z.boolean().default(false),   // unpublished today; becomes a public badge later
+
+  // --- third-party trust ratings; raw source values, citable, blended at render time in src/lib/rating.ts ---
+  trustpilotRating: z.number().min(0).max(5).optional(),
+  trustpilotReviewCount: z.number().int().min(0).optional(),
+  trustpilotEvidenceUrl: z.string().url().optional(),
+
+  googleRating: z.number().min(0).max(5).optional(),
+  googleReviewCount: z.number().int().min(0).optional(),
+  googleEvidenceUrl: z.string().url().optional(),
+
+  glassdoorRating: z.number().min(0).max(5).optional(),
+  glassdoorReviewCount: z.number().int().min(0).optional(),
+  glassdoorEvidenceUrl: z.string().url().optional(),
+
+  ratingsLastChecked: z.coerce.date().optional(),
 });
 
 const providers = defineCollection({
