@@ -38,6 +38,26 @@ export function itemListJsonLd(
   };
 }
 
+// Google's own FAQ rich-result display is now largely restricted to
+// government/health sites, but FAQPage schema is still valid markup and is
+// exactly the structural pattern LLM-based answer engines (Perplexity,
+// ChatGPT search, Gemini, Copilot) favor when extracting direct answers —
+// this is for AEO/GEO, not chasing a Google SERP rich snippet specifically.
+export function faqPageJsonLd(items: { question: string; answer: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: items.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  };
+}
+
 export function breadcrumbListJsonLd(items: { name: string; url: string }[]) {
   return {
     '@context': 'https://schema.org',

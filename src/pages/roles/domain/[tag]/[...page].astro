@@ -3,27 +3,32 @@ import type { GetStaticPathsOptions, Page } from 'astro';
 import Layout from '../../../../layouts/Layout.astro';
 import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
 import RolesFilter from '../../../../components/RolesFilter';
+import FAQ from '../../../../components/FAQ.astro';
 import { getEligibleActiveRoles, groupByDomain, toRoleRow, type RoleWithProvider } from '../../../../lib/role-rows';
-import { itemListJsonLd, breadcrumbListJsonLd } from '../../../../lib/jsonld';
+import { itemListJsonLd, breadcrumbListJsonLd, faqPageJsonLd } from '../../../../lib/jsonld';
 import { DOMAIN_TAG_LABELS } from '../../../../lib/taxonomy';
+import { computeHubStats, domainHubFAQs, DOMAIN_TAG_DESCRIPTIONS, type HubStats } from '../../../../lib/role-faq';
 
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
   const PAGE_SIZE = 24;
   const eligible = await getEligibleActiveRoles();
   const byDomain = groupByDomain(eligible);
   return [...byDomain.entries()].flatMap(([tag, items]) =>
-    paginate(items, { params: { tag }, pageSize: PAGE_SIZE })
+    paginate(items, { params: { tag }, pageSize: PAGE_SIZE, props: { stats: computeHubStats(items) } })
   );
 }
 
 interface Props {
   page: Page<RoleWithProvider>;
+  stats: HubStats;
 }
 
 const { tag } = Astro.params;
-const { page } = Astro.props;
+const { page, stats } = Astro.props;
 const rows = page.data.map(({ role, provider }) => toRoleRow(role, provider));
-const label = DOMAIN_TAG_LABELS[tag as string] ?? tag;
+const label = (DOMAIN_TAG_LABELS[tag as string] ?? tag) as string;
+const blurb = DOMAIN_TAG_DESCRIPTIONS[tag as string] ?? `AI-training work in the ${label} domain.`;
+const faqs = domainHubFAQs(tag as string, stats);
 
 const canonicalPath = page.currentPage === 1 ? `/roles/domain/${tag}/` : `/roles/domain/${tag}/${page.currentPage}/`;
 const pageUrl = new URL(canonicalPath, Astro.site).toString();
@@ -31,22 +36,26 @@ const pageUrl = new URL(canonicalPath, Astro.site).toString();
 const breadcrumbItems = [
   { name: 'Home', url: new URL('/', Astro.site).toString() },
   { name: 'Roles', url: new URL('/roles/', Astro.site).toString() },
-  { name: label as string, url: new URL(`/roles/domain/${tag}/`, Astro.site).toString() },
+  { name: label, url: new URL(`/roles/domain/${tag}/`, Astro.site).toString() },
 ];
 
 const jsonLd = [
   breadcrumbListJsonLd(breadcrumbItems),
   itemListJsonLd(rows.map((r) => ({ name: r.title, url: new URL(r.href, Astro.site).toString() })), pageUrl),
+  faqPageJsonLd(faqs),
 ];
 
 const title = `${label} roles across AI-training networks | HumanSourcer`;
-const description = `${page.total} open ${String(label).toLowerCase()} roles across HumanSourcer's expert AI-training networks.`;
+const description = `${stats.totalRoles} open ${label.toLowerCase()} roles across HumanSourcer's expert AI-training networks. ${blurb}`;
 ---
 
 <Layout title={title} description={description} canonicalPath={canonicalPath} jsonLd={jsonLd}>
   <Breadcrumbs items={breadcrumbItems} />
   <h1 class="text-3xl font-bold tracking-tight">{label} roles</h1>
-  <p class="mt-2 max-w-2xl text-slate-600">{page.total} open roles in {label} across expert-tier AI-training networks.</p>
+  <p class="mt-2 max-w-2xl font-medium text-slate-800">
+    {stats.totalRoles} open {label.toLowerCase()} roles are currently listed across {stats.companies.length} AI-training networks.
+  </p>
+  <p class="mt-2 max-w-2xl text-slate-600">{blurb}</p>
 
   <div class="mt-8">
     <RolesFilter roles={rows} client:load />
@@ -63,4 +72,6 @@ const description = `${page.total} open ${String(label).toLowerCase()} roles acr
       ) : <span />}
     </nav>
   )}
+
+  <FAQ items={faqs} />
 </Layout>

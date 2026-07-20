@@ -3,26 +3,31 @@ import type { GetStaticPathsOptions, Page } from 'astro';
 import Layout from '../../../../layouts/Layout.astro';
 import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
 import RolesFilter from '../../../../components/RolesFilter';
+import FAQ from '../../../../components/FAQ.astro';
 import { getEligibleActiveRoles, groupByCompany, toRoleRow, type RoleWithProvider } from '../../../../lib/role-rows';
-import { itemListJsonLd, breadcrumbListJsonLd } from '../../../../lib/jsonld';
+import { itemListJsonLd, breadcrumbListJsonLd, faqPageJsonLd } from '../../../../lib/jsonld';
+import { computeHubStats, companyHubFAQs, type HubStats } from '../../../../lib/role-faq';
 
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
   const PAGE_SIZE = 24;
   const eligible = await getEligibleActiveRoles();
   const byCompany = groupByCompany(eligible);
   return [...byCompany.entries()].flatMap(([slug, items]) =>
-    paginate(items, { params: { slug }, pageSize: PAGE_SIZE })
+    paginate(items, { params: { slug }, pageSize: PAGE_SIZE, props: { stats: computeHubStats(items) } })
   );
 }
 
 interface Props {
   page: Page<RoleWithProvider>;
+  stats: HubStats;
 }
 
 const { slug } = Astro.params;
-const { page } = Astro.props;
+const { page, stats } = Astro.props;
 const rows = page.data.map(({ role, provider }) => toRoleRow(role, provider));
-const workerBrand = page.data[0]?.provider.workerBrand ?? slug;
+const provider = page.data[0]?.provider;
+const workerBrand = provider?.workerBrand ?? slug;
+const faqs = provider ? companyHubFAQs(provider, stats) : [];
 
 const canonicalPath = page.currentPage === 1 ? `/roles/company/${slug}/` : `/roles/company/${slug}/${page.currentPage}/`;
 const pageUrl = new URL(canonicalPath, Astro.site).toString();
@@ -37,18 +42,22 @@ const breadcrumbItems = [
 const jsonLd = [
   breadcrumbListJsonLd(breadcrumbItems),
   itemListJsonLd(rows.map((r) => ({ name: r.title, url: new URL(r.href, Astro.site).toString() })), pageUrl),
+  ...(faqs.length > 0 ? [faqPageJsonLd(faqs)] : []),
 ];
 
 const title = `${workerBrand} open roles | HumanSourcer`;
-const description = `${page.total} open roles at ${workerBrand}, part of HumanSourcer's expert AI-training network directory.`;
+const description = provider
+  ? `${stats.totalRoles} open roles at ${workerBrand}. ${provider.typicalWork}`
+  : `${stats.totalRoles} open roles at ${workerBrand}, part of HumanSourcer's expert AI-training network directory.`;
 ---
 
 <Layout title={title} description={description} canonicalPath={canonicalPath} jsonLd={jsonLd}>
   <Breadcrumbs items={breadcrumbItems} />
   <h1 class="text-3xl font-bold tracking-tight">{workerBrand} open roles</h1>
-  <p class="mt-2 max-w-2xl text-slate-600">
-    {page.total} open roles at {workerBrand}. See the <a href={providerUrl} class="underline">full network profile</a>.
+  <p class="mt-2 max-w-2xl font-medium text-slate-800">
+    {stats.totalRoles} open roles at {workerBrand} are currently listed. See the <a href={providerUrl} class="underline">full network profile</a>.
   </p>
+  {provider && <p class="mt-2 max-w-2xl text-slate-600">{provider.typicalWork}</p>}
 
   <div class="mt-8">
     <RolesFilter roles={rows} client:load />
@@ -65,4 +74,6 @@ const description = `${page.total} open roles at ${workerBrand}, part of HumanSo
       ) : <span />}
     </nav>
   )}
+
+  {faqs.length > 0 && <FAQ items={faqs} />}
 </Layout>

@@ -1,10 +1,12 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import FAQ from '../../../components/FAQ.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { getAllRolesForPages, rolePagePath, roleSlug, type FullRole } from '../../../lib/roles';
-import { breadcrumbListJsonLd, jobPostingJsonLd } from '../../../lib/jsonld';
+import { breadcrumbListJsonLd, jobPostingJsonLd, faqPageJsonLd } from '../../../lib/jsonld';
 import { composeRoleDescription } from '../../../lib/role-description';
+import { roleFAQs } from '../../../lib/role-faq';
 import {
   taskType,
   locationBucket,
@@ -67,8 +69,17 @@ const breadcrumbItems = [
   { name: role.title, url: roleUrl },
 ];
 
+// FAQ only for active roles — "how do I apply" etc. don't make sense once a
+// role is gone, and grace-window pages deliberately stay minimal (no
+// JobPosting either — see jobPostingJsonLd's own is_active gate).
+const faqs = role.is_active ? roleFAQs(role, provider) : [];
+
 const jsonLd = role.is_active
-  ? [breadcrumbListJsonLd(breadcrumbItems), jobPostingJsonLd(role, provider, roleUrl)]
+  ? [
+      breadcrumbListJsonLd(breadcrumbItems),
+      jobPostingJsonLd(role, provider, roleUrl),
+      faqPageJsonLd(faqs),
+    ]
   : [breadcrumbListJsonLd(breadcrumbItems)];
 
 const description = composeRoleDescription(role, provider);
@@ -79,6 +90,16 @@ const title = role.is_active
 const task = taskType(role);
 const location = locationBucket({ location: role.location }, geographyScope(provider.geography));
 const pay = payBand(role);
+
+// Direct-answer lead sentence — states the core facts (what/where/pay) in
+// one extractable line before any elaboration, the pattern AI Overviews and
+// LLM answer engines most reliably lift for a snippet-style answer.
+const leadSentence = [
+  `${role.title} is an open role at ${provider.workerBrand}`,
+  location === 'remote' ? ', available remotely' : role.location ? `, located in ${role.location}` : '',
+  pay !== 'unspecified' && role.pay_text ? `, with pay listed as ${role.pay_text}` : '',
+  '.',
+].join('');
 ---
 
 <Layout title={title} description={description} canonicalPath={path} jsonLd={jsonLd} noindex={!role.is_active}>
@@ -112,8 +133,13 @@ const pay = payBand(role);
     )}
   </div>
 
+  {role.is_active && (
+    <p class="mt-4 max-w-2xl font-medium text-slate-800">{leadSentence}</p>
+  )}
+
   <div class="mt-6 max-w-2xl text-slate-700">
-    <p>{description}</p>
+    <h2 class="text-sm uppercase tracking-wide text-slate-400">About this role</h2>
+    <p class="mt-2">{description}</p>
   </div>
 
   {role.pay_text && (
@@ -141,6 +167,17 @@ const pay = payBand(role);
     </div>
   )}
 
+  <div class="mt-10 border-t border-slate-200 pt-6">
+    <h2 class="text-sm uppercase tracking-wide text-slate-400">About {provider.workerBrand}</h2>
+    <p class="mt-2 max-w-2xl text-slate-700">
+      {provider.workerBrand}'s connection to {provider.parentGroup}: {provider.relationship}. {provider.typicalWork}
+    </p>
+    <p class="mt-2 text-sm text-slate-500">
+      Ownership confidence: {provider.ownershipConfidence}.{' '}
+      <a href={providerUrl} class="underline">See the full network profile &rarr;</a>
+    </p>
+  </div>
+
   {similarRoles.length > 0 && (
     <div class="mt-10 border-t border-slate-200 pt-6">
       <h2 class="text-sm uppercase tracking-wide text-slate-400">Similar open roles</h2>
@@ -154,4 +191,6 @@ const pay = payBand(role);
       </div>
     </div>
   )}
+
+  {faqs.length > 0 && <FAQ items={faqs} />}
 </Layout>
