@@ -155,14 +155,14 @@ const leadSentence = [
       <a
         href={role.apply_url}
         rel="nofollow sponsored"
-        class="inline-block rounded-md bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-700"
+        class="inline-block rounded-md bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink transition-colors duration-200 ease-out hover:bg-accent-hover"
       >
         Apply at {provider.workerBrand} &rarr;
       </a>
     </div>
   ) : (
     <div class="mt-8">
-      <a href={providerUrl} class="inline-block rounded-md bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-700">
+      <a href={providerUrl} class="inline-block rounded-md bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink transition-colors duration-200 ease-out hover:bg-accent-hover">
         View {provider.workerBrand}&rsquo;s current open roles &rarr;
       </a>
     </div>

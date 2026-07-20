@@ -35,37 +35,46 @@ const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <link rel="preload" href="/fonts/manrope-variable.woff2" as="font" type="font/woff2" crossorigin />
 
     {jsonLdBlocks.map((block) => (
       <script type="application/ld+json" set:html={JSON.stringify(block)} />
     ))}
   </head>
-  <body class="min-h-screen bg-white text-slate-900 antialiased">
-    <header class="border-b border-slate-200">
+  <body class="min-h-screen bg-bg font-body text-ink-primary antialiased">
+    <header class="border-b border-border">
       <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-        <a href="/" class="text-lg font-semibold tracking-tight">HumanSourcer</a>
-        <nav class="flex gap-4 text-sm text-slate-600">
+        <a href="/" class="font-display text-lg font-semibold tracking-tight text-ink-primary">
+          HumanSourcer
+        </a>
+        <nav class="flex gap-4 text-sm text-ink-secondary">
           <a
             href="/"
-            class={Astro.url.pathname === '/' || Astro.url.pathname.startsWith('/providers')
-              ? 'font-semibold text-slate-900'
-              : 'hover:text-slate-900'}
+            class={`transition-colors duration-200 ease-out ${
+              Astro.url.pathname === '/' || Astro.url.pathname.startsWith('/providers')
+                ? 'font-semibold text-ink-primary'
+                : 'hover:text-ink-primary'
+            }`}
           >
             Providers
           </a>
           <a
             href="/gig/"
-            class={Astro.url.pathname.startsWith('/gig')
-              ? 'font-semibold text-slate-900'
-              : 'hover:text-slate-900'}
+            class={`transition-colors duration-200 ease-out ${
+              Astro.url.pathname.startsWith('/gig')
+                ? 'font-semibold text-ink-primary'
+                : 'hover:text-ink-primary'
+            }`}
           >
             Gig
           </a>
           <a
             href="/roles/"
-            class={Astro.url.pathname.startsWith('/roles')
-              ? 'font-semibold text-slate-900'
-              : 'hover:text-slate-900'}
+            class={`transition-colors duration-200 ease-out ${
+              Astro.url.pathname.startsWith('/roles')
+                ? 'font-semibold text-ink-primary'
+                : 'hover:text-ink-primary'
+            }`}
           >
             Roles
           </a>
@@ -75,8 +84,8 @@ const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <main class="mx-auto max-w-6xl px-4 py-8">
       <slot />
     </main>
-    <footer class="mt-16 border-t border-slate-200">
-      <div class="mx-auto max-w-6xl px-4 py-8 text-sm text-slate-500">
+    <footer class="mt-16 border-t border-border">
+      <div class="mx-auto max-w-6xl px-4 py-8 text-sm text-ink-tertiary">
         <p>
           HumanSourcer indexes publicly documented worker-facing access points for AI-training
           networks. Every ownership and status claim links to its source. Not affiliated with any
