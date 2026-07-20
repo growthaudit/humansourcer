@@ -12,7 +12,7 @@
 export type TaskType =
   | 'coding-swe'
   | 'data-annotation-labeling'
-  | 'model-evaluation-red-teaming'
+  | 'model-evaluation'
   | 'writing-editing'
   | 'voice-audio'
   | 'research-analysis'
@@ -44,7 +44,7 @@ const TASK_TYPE_RULES: [RegExp, TaskType][] = [
   [/customer (support|service)|support agent|\boperations\b|\bops\b|implementation specialist|\bhr specialist|human resources/i, 'customer-support-ops'],
   [/\bwrit(er|ing)\b|\beditor\b|\bediting\b|\bcontent\b|copy ?edit|proofread/i, 'writing-editing'],
   [/\banalyst\b|\bresearch\b|analytics engineer/i, 'research-analysis'],
-  [/\bevaluat|\breviewer\b|red.?team|task author|ai train(er|ing)|\bbenchmark\b|\brater\b|\brating\b/i, 'model-evaluation-red-teaming'],
+  [/\bevaluat|\breviewer\b|red.?team|task author|ai train(er|ing)|\bbenchmark\b|\brater\b|\brating\b/i, 'model-evaluation'],
 ];
 
 export function taskType({ title }: TaskTypeInput): TaskType {
@@ -144,7 +144,7 @@ export function payBand(role: PayInput): PayBand {
 export const TASK_TYPE_LABELS: Record<TaskType, string> = {
   'coding-swe': 'Coding / software engineering',
   'data-annotation-labeling': 'Data annotation / labeling',
-  'model-evaluation-red-teaming': 'Model evaluation / red-teaming',
+  'model-evaluation': 'AI model evaluation',
   'writing-editing': 'Writing / editing',
   'voice-audio': 'Voice / audio',
   'research-analysis': 'Research / analysis',

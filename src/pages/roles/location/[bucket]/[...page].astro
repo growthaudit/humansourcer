@@ -4,16 +4,21 @@ import Layout from '../../../../layouts/Layout.astro';
 import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
 import RolesFilter from '../../../../components/RolesFilter';
 import FAQ from '../../../../components/FAQ.astro';
-import { getEligibleActiveRoles, groupByCompany, toRoleRow, type RoleWithProvider } from '../../../../lib/role-rows';
+import { getEligibleActiveRoles, groupByLocationBucket, toRoleRow, type RoleWithProvider } from '../../../../lib/role-rows';
 import { itemListJsonLd, breadcrumbListJsonLd, faqPageJsonLd } from '../../../../lib/jsonld';
-import { computeHubStats, companyHubFAQs, type HubStats } from '../../../../lib/role-faq';
+import { LOCATION_BUCKET_LABELS, type LocationBucket } from '../../../../lib/role-taxonomy';
+import { computeHubStats, locationHubFAQs, LOCATION_BUCKET_DESCRIPTIONS, type HubStats } from '../../../../lib/role-faq';
 
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
   const PAGE_SIZE = 24;
   const eligible = await getEligibleActiveRoles();
-  const byCompany = groupByCompany(eligible);
-  return [...byCompany.entries()].flatMap(([slug, items]) =>
-    paginate(items, { params: { slug }, pageSize: PAGE_SIZE, props: { stats: computeHubStats(items) } })
+  const byLocation = groupByLocationBucket(eligible);
+  // "unspecified" isn't a real location facet (it means the source
+  // disclosed nothing) — generating a hub for it would be exactly the
+  // thin/no-search-intent content this section is designed to avoid.
+  byLocation.delete('unspecified');
+  return [...byLocation.entries()].flatMap(([bucket, items]) =>
+    paginate(items, { params: { bucket }, pageSize: PAGE_SIZE, props: { stats: computeHubStats(items) } })
   );
 }
 
@@ -22,44 +27,40 @@ interface Props {
   stats: HubStats;
 }
 
-const { slug } = Astro.params;
+const { bucket } = Astro.params;
 const { page, stats } = Astro.props;
+const bucketValue = bucket as LocationBucket;
 const rows = page.data.map(({ role, provider }) => toRoleRow(role, provider));
-const provider = page.data[0]?.provider;
-const workerBrand = provider?.workerBrand ?? slug;
-const faqs = provider ? companyHubFAQs(provider, stats) : [];
+const label = LOCATION_BUCKET_LABELS[bucketValue] ?? bucket;
+const blurb = LOCATION_BUCKET_DESCRIPTIONS[bucketValue] ?? `AI-training roles listed as ${String(label).toLowerCase()}.`;
+const faqs = locationHubFAQs(bucketValue, stats);
 
-const canonicalPath = page.currentPage === 1 ? `/roles/company/${slug}/` : `/roles/company/${slug}/${page.currentPage}/`;
+const canonicalPath = page.currentPage === 1 ? `/roles/location/${bucket}/` : `/roles/location/${bucket}/${page.currentPage}/`;
 const pageUrl = new URL(canonicalPath, Astro.site).toString();
-const providerUrl = new URL(`/providers/${slug}`, Astro.site).toString();
 
 const breadcrumbItems = [
   { name: 'Home', url: new URL('/', Astro.site).toString() },
   { name: 'Roles', url: new URL('/roles/', Astro.site).toString() },
-  { name: workerBrand as string, url: new URL(`/roles/company/${slug}/`, Astro.site).toString() },
+  { name: label as string, url: new URL(`/roles/location/${bucket}/`, Astro.site).toString() },
 ];
 
 const jsonLd = [
   breadcrumbListJsonLd(breadcrumbItems),
   itemListJsonLd(rows.map((r) => ({ name: r.title, url: new URL(r.href, Astro.site).toString() })), pageUrl),
-  ...(faqs.length > 0 ? [faqPageJsonLd(faqs)] : []),
+  faqPageJsonLd(faqs),
 ];
 
-const title = provider
-  ? `Is ${workerBrand} Legit? Pay & ${stats.totalRoles} Open Roles | HumanSourcer`
-  : `${workerBrand} open roles | HumanSourcer`;
-const description = provider
-  ? `Is ${workerBrand} legit? ${provider.relationship}. ${stats.totalRoles} open roles listed now — see pay, location, and ownership evidence.`
-  : `${stats.totalRoles} open roles at ${workerBrand}, part of HumanSourcer's expert AI-training network directory.`;
+const title = `${label} AI-training roles | HumanSourcer`;
+const description = `${stats.totalRoles} open ${String(label).toLowerCase()} roles across HumanSourcer's expert AI-training networks. ${blurb}`;
 ---
 
 <Layout title={title} description={description} canonicalPath={canonicalPath} jsonLd={jsonLd}>
   <Breadcrumbs items={breadcrumbItems} />
-  <h1 class="text-3xl font-bold tracking-tight">{workerBrand} open roles</h1>
+  <h1 class="text-3xl font-bold tracking-tight">{label} roles</h1>
   <p class="mt-2 max-w-2xl font-medium text-slate-800">
-    {stats.totalRoles} open roles at {workerBrand} are currently listed. See the <a href={providerUrl} class="underline">full network profile</a>.
+    {stats.totalRoles} open {String(label).toLowerCase()} roles are currently listed across {stats.companies.length} AI-training networks.
   </p>
-  {provider && <p class="mt-2 max-w-2xl text-slate-600">{provider.typicalWork}</p>}
+  <p class="mt-2 max-w-2xl text-slate-600">{blurb}</p>
 
   <div class="mt-8">
     <RolesFilter roles={rows} client:load />
@@ -77,5 +78,5 @@ const description = provider
     </nav>
   )}
 
-  {faqs.length > 0 && <FAQ items={faqs} />}
+  <FAQ items={faqs} />
 </Layout>

@@ -1,0 +1,143 @@
+---
+// Ranking is derived entirely from data already in the registry/Supabase —
+// confirmed ownership first, then live open-role count — never a
+// subjective/paid ranking. No provider currently pays for placement (see
+// the humansourcer project's Phase 3 plan for paid placement, not yet
+// built), and the FAQ below says so explicitly.
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { confidenceLevel, DOMAIN_TAG_LABELS } from '../lib/taxonomy';
+import { getActiveRolesByProvider } from '../lib/roles';
+import { itemListJsonLd, faqPageJsonLd, breadcrumbListJsonLd } from '../lib/jsonld';
+import FAQ from '../components/FAQ.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+
+const allProviders = await getCollection('providers');
+const experts = allProviders.filter((p) => p.data.audienceTier === 'expert');
+const rolesByProvider = await getActiveRolesByProvider();
+
+interface Ranked {
+  slug: string;
+  workerBrand: string;
+  parentGroup: string;
+  typicalWork: string;
+  domainTags: string[];
+  confirmed: boolean;
+  openRoleCount: number;
+}
+
+const ranked: Ranked[] = experts
+  .map((p) => ({
+    slug: p.data.slug,
+    workerBrand: p.data.workerBrand,
+    parentGroup: p.data.parentGroup,
+    typicalWork: p.data.typicalWork,
+    domainTags: p.data.domainTags,
+    confirmed: confidenceLevel(p.data.ownershipConfidence) === 'confirmed',
+    openRoleCount: rolesByProvider.get(p.data.slug)?.totalCount ?? 0,
+  }))
+  .sort((a, b) => (b.confirmed ? 1 : 0) - (a.confirmed ? 1 : 0) || b.openRoleCount - a.openRoleCount);
+
+const bestOverall = ranked.slice(0, 6);
+
+const FEATURED_DOMAINS = ['generalist', 'coding', 'law', 'medicine', 'finance', 'science-stem'];
+const byDomain = FEATURED_DOMAINS.map((tag) => ({
+  tag,
+  label: DOMAIN_TAG_LABELS[tag] ?? tag,
+  picks: ranked.filter((p) => p.domainTags.includes(tag)).slice(0, 2),
+})).filter((d) => d.picks.length > 0);
+
+const canonicalPath = '/best-ai-training-platforms/';
+const pageUrl = new URL(canonicalPath, Astro.site).toString();
+
+const breadcrumbItems = [
+  { name: 'Home', url: new URL('/', Astro.site).toString() },
+  { name: 'Best AI training platforms', url: pageUrl },
+];
+
+const faqs = [
+  {
+    question: 'What is the best AI training platform?',
+    answer: `Based on confirmed ownership and current open-role volume across HumanSourcer's ${experts.length} tracked expert-tier networks, the top picks right now are ${bestOverall.map((p) => p.workerBrand).join(', ')}. "Best" varies by domain and access model — see the breakdowns below.`,
+  },
+  {
+    question: 'How does HumanSourcer rank these platforms?',
+    answer:
+      'By two factors pulled directly from the registry and the daily role scrape: confirmed ownership (not just reported/inferred) first, then current open-role count. No provider pays for placement here — this ranking has no sponsored component.',
+  },
+  {
+    question: 'How often is this ranking updated?',
+    answer: "Open-role counts update daily via HumanSourcer's automated scrape. Ownership/status data is manually re-verified periodically, with a cited source on every provider's profile.",
+  },
+  {
+    question: 'Are there AI training platforms for beginners with no experience?',
+    answer: "Yes — HumanSourcer's no-experience-required guide (linked below) covers networks with open, self-serve registration.",
+  },
+];
+
+const jsonLd = [
+  breadcrumbListJsonLd(breadcrumbItems),
+  itemListJsonLd(
+    bestOverall.map((p) => ({ name: p.workerBrand, url: new URL(`/providers/${p.slug}`, Astro.site).toString() })),
+    pageUrl
+  ),
+  faqPageJsonLd(faqs),
+];
+
+const title = 'Best AI Training Platforms (2026) | HumanSourcer';
+const description = `The best AI-training and evaluation platforms, ranked by confirmed ownership and live open-role volume across ${experts.length} tracked expert networks — plus picks by domain.`;
+---
+
+<Layout title={title} description={description} canonicalPath={canonicalPath} jsonLd={jsonLd}>
+  <Breadcrumbs items={breadcrumbItems} />
+  <h1 class="text-3xl font-bold tracking-tight">Best AI training platforms</h1>
+  <p class="mt-2 max-w-2xl text-slate-600">
+    Ranked from data, not opinion: confirmed ownership first, then current open-role count, pulled from
+    HumanSourcer's daily scrape across {experts.length} expert-tier AI-training networks. No provider pays for
+    placement on this list.
+  </p>
+
+  <div class="mt-10">
+    <h2 class="text-xl font-semibold tracking-tight">Best overall</h2>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {bestOverall.map((p, i) => (
+        <a href={`/providers/${p.slug}`} class="block rounded-lg border border-slate-200 p-4 transition hover:border-slate-400 hover:shadow-sm">
+          <div class="flex items-start justify-between gap-2">
+            <div class="text-xs uppercase tracking-wide text-slate-400">{p.parentGroup}</div>
+            <span class="text-xs font-semibold text-slate-400">#{i + 1}</span>
+          </div>
+          <div class="mt-1 font-medium">{p.workerBrand}</div>
+          <p class="mt-1 text-sm text-slate-600">{p.typicalWork}</p>
+          <div class="mt-2 flex items-center gap-2 text-xs text-slate-500">
+            {p.confirmed && <span class="rounded bg-slate-100 px-2 py-0.5">Confirmed ownership</span>}
+            {p.openRoleCount > 0 && <span>{p.openRoleCount} open roles</span>}
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+
+  {byDomain.map((d) => (
+    <div class="mt-10">
+      <h2 class="text-xl font-semibold tracking-tight">Best for {d.label.toLowerCase()}</h2>
+      <div class="mt-4 grid gap-4 sm:grid-cols-2">
+        {d.picks.map((p) => (
+          <a href={`/providers/${p.slug}`} class="block rounded-lg border border-slate-200 p-4 transition hover:border-slate-400 hover:shadow-sm">
+            <div class="text-xs uppercase tracking-wide text-slate-400">{p.parentGroup}</div>
+            <div class="mt-1 font-medium">{p.workerBrand}</div>
+            <p class="mt-1 text-sm text-slate-600">{p.typicalWork}</p>
+            {p.openRoleCount > 0 && <div class="mt-2 text-xs text-slate-500">{p.openRoleCount} open roles listed now</div>}
+          </a>
+        ))}
+      </div>
+    </div>
+  ))}
+
+  <p class="mt-10 max-w-2xl text-slate-600">
+    New to this and don't have relevant experience yet? See
+    <a href="/no-experience-required/" class="underline">AI training platforms with no experience required</a>,
+    or <a href="/" class="underline">compare the full directory</a>.
+  </p>
+
+  <FAQ items={faqs} />
+</Layout>

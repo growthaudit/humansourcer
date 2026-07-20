@@ -77,6 +77,17 @@ export function groupByTaskType(eligible: RoleWithProvider[]): Map<TaskType, Rol
   return map;
 }
 
+export function groupByLocationBucket(eligible: RoleWithProvider[]): Map<LocationBucket, RoleWithProvider[]> {
+  const map = new Map<LocationBucket, RoleWithProvider[]>();
+  for (const item of eligible) {
+    const bucket = locationBucket({ location: item.role.location }, geographyScope(item.provider.geography));
+    if (!map.has(bucket)) map.set(bucket, []);
+    map.get(bucket)!.push(item);
+  }
+  for (const [bucket, items] of map) map.set(bucket, sortByFreshest(items));
+  return map;
+}
+
 export interface RoleRow {
   href: string;
   title: string;

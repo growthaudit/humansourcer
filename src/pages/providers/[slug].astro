@@ -45,8 +45,8 @@ const breadcrumbItems = [
 ];
 const jsonLd = [organizationJsonLd(p, profileUrl), breadcrumbListJsonLd(breadcrumbItems)];
 
-const title = `${p.workerBrand} — ${p.parentGroup} | HumanSourcer`;
-const description = `${p.workerBrand} is ${p.parentGroup}'s ${p.portalType.toLowerCase()}. ${p.typicalWork}`;
+const title = `Is ${p.workerBrand} Legit? Pay & Ownership Review | HumanSourcer`;
+const description = `Is ${p.workerBrand} legit? ${p.relationship} (ownership confidence: ${p.ownershipConfidence.toLowerCase()}). ${p.typicalWork}.`;
 
 const access = accessModelCategory(p.accessModel);
 const geo = geographyScope(p.geography);

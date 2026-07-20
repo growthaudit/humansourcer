@@ -167,8 +167,8 @@ export const TASK_TYPE_DESCRIPTIONS: Record<TaskType, string> = {
   'coding-swe':
     'Software engineering work — writing, reviewing, or building tools and systems, often specifically to support AI training or evaluation.',
   'data-annotation-labeling': 'Labeling, annotating, or collecting structured data used to train AI models.',
-  'model-evaluation-red-teaming':
-    'Evaluating AI model outputs, authoring test tasks, or red-teaming models to find weaknesses and failure modes.',
+  'model-evaluation':
+    'Evaluating AI model outputs, authoring test tasks, or reviewing model responses to identify errors, weaknesses, and failure modes.',
   'writing-editing': 'Writing or editing content used to train or evaluate AI language capabilities.',
   'voice-audio': 'Recording, evaluating, or acting for voice and audio data used to train AI speech models.',
   'research-analysis': 'Research and analytical work supporting AI training, evaluation, or benchmarking.',
@@ -192,6 +192,30 @@ export function domainHubFAQs(tag: string, stats: HubStats): FAQItem[] {
     },
     { question: `What do ${label} roles pay?`, answer: summarizePayBands(stats) },
     { question: `Are ${label} roles remote?`, answer: summarizeLocations(stats) },
+  ];
+}
+
+export const LOCATION_BUCKET_DESCRIPTIONS: Partial<Record<LocationBucket, string>> = {
+  remote: 'Fully remote AI-training and evaluation roles with no fixed office location.',
+  us: 'AI-training and evaluation roles listed specifically for workers in the United States.',
+  'region-specific': 'AI-training and evaluation roles restricted to a specific country or region.',
+  'global-ish': 'AI-training and evaluation roles open to applicants worldwide.',
+};
+
+export function locationHubFAQs(bucket: LocationBucket, stats: HubStats): FAQItem[] {
+  const label = LOCATION_BUCKET_LABELS[bucket];
+  const description = LOCATION_BUCKET_DESCRIPTIONS[bucket] ?? `AI-training roles listed as ${label.toLowerCase()}.`;
+  return [
+    { question: `What are ${label} AI-training roles?`, answer: description },
+    {
+      question: `How many ${label} roles are currently open?`,
+      answer: `${stats.totalRoles} open ${label.toLowerCase()} roles are currently listed across HumanSourcer's tracked networks. This count updates daily.`,
+    },
+    {
+      question: `Which companies have ${label} roles?`,
+      answer: `Currently: ${formatCompanyList(stats.companies)}.`,
+    },
+    { question: `What do ${label} roles pay?`, answer: summarizePayBands(stats) },
   ];
 }
 

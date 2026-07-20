@@ -1,0 +1,139 @@
+---
+// "No experience required" maps to accessModelCategory === 'open': these
+// networks use open, self-serve registration with no selective
+// interview/portfolio-review gate to apply. That's a claim about the
+// application process, not about skill — several open-access providers
+// still expect real domain fit once you're in, so the copy below is
+// explicit about that distinction rather than overclaiming "no skills
+// needed" for providers whose own typicalWork says otherwise.
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { accessModelCategory, ACCESS_MODEL_LABELS, DOMAIN_TAG_LABELS } from '../lib/taxonomy';
+import { getActiveRolesByProvider } from '../lib/roles';
+import { itemListJsonLd, faqPageJsonLd, breadcrumbListJsonLd } from '../lib/jsonld';
+import FAQ from '../components/FAQ.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+
+const allProviders = await getCollection('providers');
+const experts = allProviders.filter((p) => p.data.audienceTier === 'expert');
+const rolesByProvider = await getActiveRolesByProvider();
+
+const openAccess = experts
+  .filter((p) => accessModelCategory(p.data.accessModel) === 'open')
+  .map((p) => ({
+    slug: p.data.slug,
+    workerBrand: p.data.workerBrand,
+    parentGroup: p.data.parentGroup,
+    typicalWork: p.data.typicalWork,
+    domainTags: p.data.domainTags,
+    isGeneralist: p.data.domainTags.includes('generalist'),
+    openRoleCount: rolesByProvider.get(p.data.slug)?.totalCount ?? 0,
+  }))
+  .sort((a, b) => (b.isGeneralist ? 1 : 0) - (a.isGeneralist ? 1 : 0) || b.openRoleCount - a.openRoleCount);
+
+const generalistPicks = openAccess.filter((p) => p.isGeneralist);
+const domainSpecificPicks = openAccess.filter((p) => !p.isGeneralist);
+
+const canonicalPath = '/no-experience-required/';
+const pageUrl = new URL(canonicalPath, Astro.site).toString();
+
+const breadcrumbItems = [
+  { name: 'Home', url: new URL('/', Astro.site).toString() },
+  { name: 'No experience required', url: pageUrl },
+];
+
+const faqs = [
+  {
+    question: 'Do AI training platforms really require no experience?',
+    answer:
+      "It depends on the platform and the role. The networks below use open, self-serve registration — no selective interview or portfolio review to apply — so anyone can start the process without prior AI-industry experience. Domain-specific ones (law, medicine, coding) still expect real subject-matter fit once you're in; the generalist ones are the closest fit for someone with zero relevant background.",
+  },
+  {
+    question: 'Which AI training platforms have open registration?',
+    answer: `${openAccess.length} of HumanSourcer's ${experts.length} tracked expert-tier networks use open or self-serve registration: ${openAccess.map((p) => p.workerBrand).join(', ')}.`,
+  },
+  {
+    question: 'What is the easiest AI training platform to join?',
+    answer:
+      generalistPicks.length > 0
+        ? `${generalistPicks.map((p) => p.workerBrand).join(' and ')} combine open registration with generalist (non-specialist) work, making them the most accessible starting points on this list.`
+        : 'Check the open-registration list below and filter for generalist domain tags.',
+  },
+];
+
+const jsonLd = [
+  breadcrumbListJsonLd(breadcrumbItems),
+  itemListJsonLd(
+    openAccess.map((p) => ({ name: p.workerBrand, url: new URL(`/providers/${p.slug}`, Astro.site).toString() })),
+    pageUrl
+  ),
+  faqPageJsonLd(faqs),
+];
+
+const title = 'No Experience Required: Open AI Training Platforms | HumanSourcer';
+const description = `${openAccess.length} AI-training networks with open, self-serve registration — no selective interview or portfolio review required to apply. Compare access, domains, and live open roles.`;
+---
+
+<Layout title={title} description={description} canonicalPath={canonicalPath} jsonLd={jsonLd}>
+  <Breadcrumbs items={breadcrumbItems} />
+  <h1 class="text-3xl font-bold tracking-tight">AI training platforms with no experience required</h1>
+  <p class="mt-2 max-w-2xl text-slate-600">
+    {openAccess.length} of {experts.length} expert-tier AI-training networks HumanSourcer tracks use open,
+    self-serve registration — no selective interview or portfolio review to apply. That's a claim about the
+    <em>application process</em>, not about skill: domain-specific networks still expect real subject-matter fit
+    once you're registered. If you have zero relevant background, start with the generalist picks below.
+  </p>
+
+  {generalistPicks.length > 0 && (
+    <div class="mt-10">
+      <h2 class="text-xl font-semibold tracking-tight">Best for true beginners: open + generalist</h2>
+      <p class="mt-1 text-sm text-slate-500">Open registration and non-specialist work — no professional credential expected.</p>
+      <div class="mt-4 grid gap-4 sm:grid-cols-2">
+        {generalistPicks.map((p) => (
+          <a href={`/providers/${p.slug}`} class="block rounded-lg border border-slate-200 p-4 transition hover:border-slate-400 hover:shadow-sm">
+            <div class="text-xs uppercase tracking-wide text-slate-400">{p.parentGroup}</div>
+            <div class="mt-1 font-medium">{p.workerBrand}</div>
+            <p class="mt-1 text-sm text-slate-600">{p.typicalWork}</p>
+            {p.openRoleCount > 0 && (
+              <div class="mt-2 text-xs text-slate-500">{p.openRoleCount} open roles listed now</div>
+            )}
+          </a>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {domainSpecificPicks.length > 0 && (
+    <div class="mt-10">
+      <h2 class="text-xl font-semibold tracking-tight">Open registration, domain-specific work</h2>
+      <p class="mt-1 text-sm text-slate-500">
+        No selective vetting to apply, but roles expect fit with a specific domain — check the tags before you register.
+      </p>
+      <div class="mt-4 grid gap-4 sm:grid-cols-2">
+        {domainSpecificPicks.map((p) => (
+          <a href={`/providers/${p.slug}`} class="block rounded-lg border border-slate-200 p-4 transition hover:border-slate-400 hover:shadow-sm">
+            <div class="text-xs uppercase tracking-wide text-slate-400">{p.parentGroup}</div>
+            <div class="mt-1 font-medium">{p.workerBrand}</div>
+            <p class="mt-1 text-sm text-slate-600">{p.typicalWork}</p>
+            <div class="mt-2 flex flex-wrap gap-1">
+              {p.domainTags.map((tag) => (
+                <span class="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-600">{DOMAIN_TAG_LABELS[tag] ?? tag}</span>
+              ))}
+            </div>
+            {p.openRoleCount > 0 && (
+              <div class="mt-2 text-xs text-slate-500">{p.openRoleCount} open roles listed now</div>
+            )}
+          </a>
+        ))}
+      </div>
+    </div>
+  )}
+
+  <p class="mt-10 max-w-2xl text-slate-600">
+    Want the full picture, including selective and application-based networks? See the
+    <a href="/" class="underline">full expert AI-training network directory</a> or
+    <a href="/roles/" class="underline">browse all open roles</a> directly.
+  </p>
+
+  <FAQ items={faqs} />
+</Layout>
