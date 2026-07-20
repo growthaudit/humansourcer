@@ -1,0 +1,52 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ProviderFilter from '../../components/ProviderFilter';
+import { getCollection } from 'astro:content';
+import { accessModelCategory, geographyScope } from '../../lib/taxonomy';
+import { itemListJsonLd } from '../../lib/jsonld';
+
+const allProviders = await getCollection('providers');
+const gigs = allProviders
+  .filter((p) => p.data.audienceTier === 'gig')
+  .sort((a, b) => a.data.workerBrand.localeCompare(b.data.workerBrand));
+
+const rows = gigs.map((p) => ({
+  slug: p.data.slug,
+  workerBrand: p.data.workerBrand,
+  parentGroup: p.data.parentGroup,
+  typicalWork: p.data.typicalWork,
+  domainTags: p.data.domainTags,
+  accessModelCategory: accessModelCategory(p.data.accessModel),
+  geographyScope: geographyScope(p.data.geography),
+}));
+
+const listUrl = new URL('/gig/', Astro.site).toString();
+const jsonLd = itemListJsonLd(
+  gigs.map((p) => ({
+    name: p.data.workerBrand,
+    url: new URL(`/gig/${p.data.slug}`, Astro.site).toString(),
+  })),
+  listUrl
+);
+
+const title = 'Gig & Task-Based AI Training Platforms | HumanSourcer';
+const description =
+  'Compare gig-tier AI-training task marketplaces like DataAnnotation, Outlier, Remotasks, and Clickworker — access model, geography, and ownership, each with a cited source.';
+---
+
+<Layout title={title} description={description} canonicalPath="/gig/" jsonLd={jsonLd}>
+  <h1 class="text-3xl font-bold tracking-tight">Gig &amp; task-based AI-training platforms</h1>
+  <p class="mt-2 max-w-2xl text-slate-600">
+    {gigs.length} task-marketplace platforms where anyone can sign up to complete AI-training and
+    data-annotation tasks — no domain expertise required for most work. Filter by domain, access
+    model, and geography. Every ownership and status claim links to its public source.
+  </p>
+  <p class="mt-2 max-w-2xl text-slate-600">
+    Looking for domain-expert roles instead? See the
+    <a href="/" class="underline">expert AI-training networks</a> directory.
+  </p>
+
+  <div class="mt-8">
+    <ProviderFilter providers={rows} client:load />
+  </div>
+</Layout>

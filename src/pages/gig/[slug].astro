@@ -2,35 +2,29 @@
 import Layout from '../../layouts/Layout.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { organizationJsonLd, breadcrumbListJsonLd } from '../../lib/jsonld';
-import { getActiveRolesByProvider, type ProviderRoles } from '../../lib/roles';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import ProviderDetail from '../../components/ProviderDetail.astro';
 
 export async function getStaticPaths() {
   const all = await getCollection('providers');
-  const experts = all.filter((p) => p.data.audienceTier === 'expert');
-  const rolesByProvider = await getActiveRolesByProvider();
-  return experts.map((provider) => ({
+  const gigs = all.filter((p) => p.data.audienceTier === 'gig');
+  return gigs.map((provider) => ({
     params: { slug: provider.data.slug },
-    props: {
-      provider,
-      providerRoles: rolesByProvider.get(provider.data.slug) ?? { roles: [], totalCount: 0 },
-    },
+    props: { provider },
   }));
 }
 
 interface Props {
   provider: CollectionEntry<'providers'>;
-  providerRoles: ProviderRoles;
 }
 
-const { provider, providerRoles }: Props = Astro.props;
+const { provider }: Props = Astro.props;
 const p = provider.data;
 
-const profileUrl = new URL(`/providers/${p.slug}`, Astro.site).toString();
+const profileUrl = new URL(`/gig/${p.slug}`, Astro.site).toString();
 const breadcrumbItems = [
   { name: 'Home', url: new URL('/', Astro.site).toString() },
-  { name: 'Providers', url: new URL('/', Astro.site).toString() },
+  { name: 'Gig platforms', url: new URL('/gig/', Astro.site).toString() },
   { name: p.workerBrand, url: profileUrl },
 ];
 const jsonLd = [organizationJsonLd(p, profileUrl), breadcrumbListJsonLd(breadcrumbItems)];
@@ -39,15 +33,15 @@ const title = `Is ${p.workerBrand} Legit? Pay & Ownership Review | HumanSourcer`
 const description = `Is ${p.workerBrand} legit? ${p.relationship} (ownership confidence: ${p.ownershipConfidence.toLowerCase()}). ${p.typicalWork}.`;
 ---
 
-<Layout title={title} description={description} canonicalPath={`/providers/${p.slug}`} jsonLd={jsonLd}>
+<Layout title={title} description={description} canonicalPath={`/gig/${p.slug}`} jsonLd={jsonLd}>
   <Breadcrumbs items={breadcrumbItems} />
   <ProviderDetail
     provider={provider}
-    providerRoles={providerRoles}
-    backHref="/"
-    backLabel="All expert networks"
+    providerRoles={{ roles: [], totalCount: 0 }}
+    backHref="/gig/"
+    backLabel="All gig platforms"
     ctaLabel={`Visit ${p.workerBrand}`}
     ctaRel="nofollow sponsored"
-    showRoles={true}
+    showRoles={false}
   />
 </Layout>

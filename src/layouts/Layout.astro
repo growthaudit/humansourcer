@@ -54,6 +54,14 @@ const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
             Providers
           </a>
           <a
+            href="/gig/"
+            class={Astro.url.pathname.startsWith('/gig')
+              ? 'font-semibold text-slate-900'
+              : 'hover:text-slate-900'}
+          >
+            Gig
+          </a>
+          <a
             href="/roles/"
             class={Astro.url.pathname.startsWith('/roles')
               ? 'font-semibold text-slate-900'

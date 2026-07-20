@@ -42,11 +42,27 @@
     "status": "Active",
     "accessModel": "Open application",
     "geography": "Selected countries",
-    "ownershipConfidence": "High \u2014 reported, not disclosed on portal",
+    "ownershipConfidence": "High — reported, not disclosed on portal",
     "relationshipEvidenceUrl": "https://nymag.com/intelligencer/article/ai-artificial-intelligence-humans-technology-business-factory.html",
     "statusEvidenceUrl": "https://www.dataannotation.tech/",
     "lastChecked": "2026-07-18",
-    "notes": "Ownership reported by New York Magazine, TIME and later press; Surge has not publicly confirmed the relationship."
+    "notes": "Ownership reported by New York Magazine, TIME and later press; Surge has not publicly confirmed the relationship.",
+    "aliases": [
+      {
+        "name": "TaskUp / Taskup.ai",
+        "url": "https://taskup.ai/",
+        "aliasType": "Reported historical worker brand",
+        "note": "Reported former worker-facing brand associated with Surge AI / DataAnnotation. Treated as an alias, not a separate current provider, since no live distinct application flow was found.",
+        "evidenceUrl": "https://time.com/6962608/data-annotation-legit-tech-jobs-ai/"
+      },
+      {
+        "name": "GetHybrid / Gethybrid.io",
+        "url": "https://gethybrid.io/",
+        "aliasType": "Reported historical worker brand",
+        "note": "Reported former worker-facing brand associated with both Surge AI and DataAnnotation.",
+        "evidenceUrl": "https://nymag.com/intelligencer/article/ai-artificial-intelligence-humans-technology-business-factory.html"
+      }
+    ]
   },
   {
     "id": "HP-003",
@@ -165,7 +181,16 @@
     "relationshipEvidenceUrl": "https://toloka.ai/annotators",
     "statusEvidenceUrl": "https://mindrift.ai/apply",
     "lastChecked": "2026-07-18",
-    "notes": "Toloka says annotator projects moved to Mindrift."
+    "notes": "Toloka says annotator projects moved to Mindrift.",
+    "aliases": [
+      {
+        "name": "Toloka Annotators",
+        "url": "https://toloka.ai/annotators",
+        "aliasType": "Former contributor route",
+        "note": "Migrated; canonical current worker brand is Mindrift.",
+        "evidenceUrl": "https://toloka.ai/annotators"
+      }
+    ]
   },
   {
     "id": "HP-008",
@@ -215,7 +240,23 @@
     "relationshipEvidenceUrl": "https://crowdgen.com/",
     "statusEvidenceUrl": "https://crowdgen.com/",
     "lastChecked": "2026-07-18",
-    "notes": "Appen Connect was replaced by CrowdGen."
+    "notes": "Appen Connect was replaced by CrowdGen.",
+    "aliases": [
+      {
+        "name": "Appen Connect",
+        "url": "https://connect.appen.com/",
+        "aliasType": "Former contributor platform name",
+        "note": "Replaced by CrowdGen, the canonical current Appen contributor brand.",
+        "evidenceUrl": "https://crowdgen.com/"
+      },
+      {
+        "name": "Figure Eight / CrowdFlower",
+        "url": "https://crowdgen.com/",
+        "aliasType": "Acquired legacy crowd platform",
+        "note": "Acquired by Appen and absorbed into CrowdGen. Useful historical alias for old job-board links and worker profiles.",
+        "evidenceUrl": "https://appen.com/company/news/appen-acquires-figure-eight"
+      }
+    ]
   },
   {
     "id": "HP-010",
@@ -237,7 +278,16 @@
     "relationshipEvidenceUrl": "https://www.telusinternational.ai/",
     "statusEvidenceUrl": "https://www.telusinternational.ai/",
     "lastChecked": "2026-07-18",
-    "notes": "Legacy TELUS International domain remains worker-facing."
+    "notes": "Legacy TELUS International domain remains worker-facing.",
+    "aliases": [
+      {
+        "name": "Lionbridge AI business unit",
+        "url": "https://www.telusinternational.ai/",
+        "aliasType": "Historical acquired business unit",
+        "note": "Only the former Lionbridge AI unit was acquired into TELUS Digital AI Community — do not merge current Lionbridge corporate freelance roles into TELUS.",
+        "evidenceUrl": "https://www.telusdigital.com/about/newsroom/acquisition-of-lionbridge-ai"
+      }
+    ]
   },
   {
     "id": "HP-011",
@@ -259,7 +309,16 @@
     "relationshipEvidenceUrl": "https://jobs.telusdigital.com/en/search/cfm5/ai-community/jobs",
     "statusEvidenceUrl": "https://jobs.telusdigital.com/en/search/cfm5/ai-community/jobs",
     "lastChecked": "2026-07-18",
-    "notes": "Useful as a separate endpoint because roles do not always appear on the portal."
+    "notes": "Useful as a separate endpoint because roles do not always appear on the portal.",
+    "aliases": [
+      {
+        "name": "Playment",
+        "url": "https://jobs.telusdigital.com/en/search/cfm5/ai-community/jobs",
+        "aliasType": "Acquired computer-vision data company",
+        "note": "Acquired by TELUS Digital; no separate public worker portal remains — use TELUS endpoints for current worker discovery.",
+        "evidenceUrl": "https://www.telusdigital.com/about/newsroom/telus-international-acquires-playment"
+      }
+    ]
   },
   {
     "id": "HP-012",
@@ -282,7 +341,16 @@
     "relationshipEvidenceUrl": "https://www.centific.com/oneforma",
     "statusEvidenceUrl": "https://www.oneforma.com/jobs/",
     "lastChecked": "2026-07-18",
-    "notes": "Pactera EDGE was rebranded as Centific."
+    "notes": "Pactera EDGE was rebranded as Centific.",
+    "aliases": [
+      {
+        "name": "Pactera EDGE",
+        "url": "https://www.oneforma.com/",
+        "aliasType": "Former parent brand",
+        "note": "Rebranded; canonical parent is now Centific.",
+        "evidenceUrl": "https://www.centific.com/oneforma"
+      }
+    ]
   },
   {
     "id": "HP-013",
@@ -655,7 +723,7 @@
     "domainTags": [
       "generalist"
     ],
-    "typicalWork": "Model training, evaluation and specialist human\u2013AI interaction",
+    "typicalWork": "Model training, evaluation and specialist human–AI interaction",
     "workerUrl": "https://deccanexperts.ai/",
     "status": "Active",
     "accessModel": "Join network / apply",
@@ -1044,7 +1112,16 @@
     "relationshipEvidenceUrl": "https://play.google.com/store/apps/details?id=net.globalme.robson",
     "statusEvidenceUrl": "https://play.google.com/store/apps/details?id=net.globalme.robson",
     "lastChecked": "2026-07-18",
-    "notes": "App store identifies Summa Linguae Technologies Canada; app has not been updated recently and user reports indicate login issues."
+    "notes": "App store identifies Summa Linguae Technologies Canada; app has not been updated recently and user reports indicate login issues.",
+    "aliases": [
+      {
+        "name": "Globalme",
+        "url": "https://robson.ai/",
+        "aliasType": "Acquired / legacy company identity",
+        "note": "The Robson app listing still references Globalme while the developer of record is Summa Linguae Technologies Canada.",
+        "evidenceUrl": "https://play.google.com/store/apps/details?id=net.globalme.robson"
+      }
+    ]
   },
   {
     "id": "HP-047",
@@ -1066,7 +1143,23 @@
     "relationshipEvidenceUrl": "https://www.linkedin.com/company/datavio-ai",
     "statusEvidenceUrl": "https://datavio.ai/",
     "lastChecked": "2026-07-18",
-    "notes": "Official site is live; many listings may be stale. Preserve Teemwork alias for deduplication."
+    "notes": "Official site is live; many listings may be stale. Preserve Teemwork alias for deduplication.",
+    "aliases": [
+      {
+        "name": "Teemwork.ai",
+        "url": "https://teemwork.ai/",
+        "aliasType": "Former platform name",
+        "note": "Rebranded to Datavio.ai. Also historically associated with iSoftStone crowdsourcing.",
+        "evidenceUrl": "https://www.linkedin.com/company/datavio-ai"
+      },
+      {
+        "name": "iSoftStone crowdsourcing",
+        "url": "https://datavio.ai/",
+        "aliasType": "Earlier operating identity",
+        "note": "Earlier operating identity now using Datavio.ai as the current canonical portal.",
+        "evidenceUrl": "https://www.linkedin.com/company/datavio-ai"
+      }
+    ]
   },
   {
     "id": "HP-048",
@@ -1158,7 +1251,16 @@
     "relationshipEvidenceUrl": "https://datamundi.ai/",
     "statusEvidenceUrl": "https://datamundi.ai/careers/",
     "lastChecked": "2026-07-18",
-    "notes": "DATAmundi is the current brand; Summa Linguae remains the legal name."
+    "notes": "DATAmundi is the current brand; Summa Linguae remains the legal name.",
+    "aliases": [
+      {
+        "name": "Summa Linguae Technologies",
+        "url": "https://datamundi.ai/",
+        "aliasType": "Legal name / former public brand",
+        "note": "Summa Linguae Technologies is the current legal entity name; DATAmundi is the current market-facing brand.",
+        "evidenceUrl": "https://datamundi.ai/"
+      }
+    ]
   },
   {
     "id": "HP-052",
@@ -1181,5 +1283,226 @@
     "statusEvidenceUrl": "https://www.ayadata.ai/career/",
     "lastChecked": "2026-07-18",
     "notes": "Location-based employment rather than an open global task marketplace."
+  },
+  {
+    "id": "HP-053",
+    "slug": "karya",
+    "parentGroup": "Karya",
+    "workerBrand": "Karya",
+    "relationship": "Direct Karya worker programme",
+    "portalType": "Managed workforce",
+    "audienceTier": "restricted",
+    "domainTags": [
+      "generalist"
+    ],
+    "typicalWork": "Data annotation and AI-training work delivered through local programmes and partner organisations, primarily in India and selected expansion markets.",
+    "workerUrl": "https://www.karya.in/",
+    "status": "No public worker portal",
+    "accessModel": "Workers recruited through local programmes and partner organisations",
+    "geography": "India plus selected expansion markets",
+    "ownershipConfidence": "Confirmed",
+    "relationshipEvidenceUrl": "https://www.karya.in/about/mission/",
+    "statusEvidenceUrl": "https://www.karya.in/about/mission/",
+    "lastChecked": "2026-07-18",
+    "notes": "National/local marketplace and partner-led onboarding rather than a normal public careers marketplace — no open global individual signup exists."
+  },
+  {
+    "id": "HP-054",
+    "slug": "humans-in-the-loop",
+    "parentGroup": "Humans in the Loop",
+    "workerBrand": "Humans in the Loop",
+    "relationship": "Direct Humans in the Loop worker programme",
+    "portalType": "Managed workforce",
+    "audienceTier": "restricted",
+    "domainTags": [
+      "generalist"
+    ],
+    "typicalWork": "Data annotation and AI-training work for conflict-affected and displaced communities, accessed through a partner network and training programmes.",
+    "workerUrl": "https://humansintheloop.org/",
+    "status": "No public worker portal",
+    "accessModel": "Workers recruited and trained through local partner organisations",
+    "geography": "Europe and Middle East partner locations",
+    "ownershipConfidence": "Confirmed",
+    "relationshipEvidenceUrl": "https://humansintheloop.org/about-us/",
+    "statusEvidenceUrl": "https://humansintheloop.org/about-us/",
+    "lastChecked": "2026-07-18",
+    "notes": "No evergreen open individual task marketplace — access is through partner network and training programmes for conflict-affected and displaced communities."
+  },
+  {
+    "id": "HP-055",
+    "slug": "innodata",
+    "parentGroup": "Innodata",
+    "workerBrand": "Innodata",
+    "relationship": "Direct Innodata corporate hiring",
+    "portalType": "Managed workforce",
+    "audienceTier": "restricted",
+    "domainTags": [
+      "generalist"
+    ],
+    "typicalWork": "Human-data annotation and AI-training delivery through corporate/project vacancies rather than an evergreen contributor portal.",
+    "workerUrl": "https://innodata.com/careers/",
+    "status": "No public worker portal",
+    "accessModel": "Managed workforce and role-by-role hiring",
+    "geography": "Location and vacancy dependent",
+    "ownershipConfidence": "Confirmed",
+    "relationshipEvidenceUrl": "https://innodata.com/careers/",
+    "statusEvidenceUrl": "https://innodata.com/careers/",
+    "lastChecked": "2026-07-18",
+    "notes": "Large human-data provider, but worker acquisition is through corporate/project vacancies rather than an evergreen contributor portal — no dedicated public task marketplace identified."
+  },
+  {
+    "id": "HP-056",
+    "slug": "cogito-tech",
+    "parentGroup": "Cogito Tech",
+    "workerBrand": "Cogito Tech",
+    "relationship": "Direct Cogito Tech corporate hiring",
+    "portalType": "Managed workforce",
+    "audienceTier": "restricted",
+    "domainTags": [
+      "generalist"
+    ],
+    "typicalWork": "Managed AI-data annotation workforce, hired through a corporate careers route.",
+    "workerUrl": "https://www.cogitotech.com/careers/",
+    "status": "No public worker portal",
+    "accessModel": "Managed annotation workforce",
+    "geography": "Primarily operating locations",
+    "ownershipConfidence": "Confirmed",
+    "relationshipEvidenceUrl": "https://www.cogitotech.com/careers/",
+    "statusEvidenceUrl": "https://www.cogitotech.com/careers/",
+    "lastChecked": "2026-07-18",
+    "notes": "Corporate careers route only — no dedicated public task marketplace identified."
+  },
+  {
+    "id": "HP-057",
+    "slug": "anolytics",
+    "parentGroup": "Anolytics",
+    "workerBrand": "Anolytics",
+    "relationship": "Direct Anolytics corporate hiring",
+    "portalType": "Managed workforce",
+    "audienceTier": "restricted",
+    "domainTags": [
+      "generalist"
+    ],
+    "typicalWork": "Managed AI-data annotation workforce, hired through a corporate careers route.",
+    "workerUrl": "https://www.anolytics.ai/career/",
+    "status": "No public worker portal",
+    "accessModel": "Managed annotation workforce",
+    "geography": "Location dependent",
+    "ownershipConfidence": "Confirmed",
+    "relationshipEvidenceUrl": "https://www.anolytics.ai/career/",
+    "statusEvidenceUrl": "https://www.anolytics.ai/career/",
+    "lastChecked": "2026-07-18",
+    "notes": "Corporate careers route only — no dedicated public task marketplace identified."
+  },
+  {
+    "id": "HP-058",
+    "slug": "e2f",
+    "parentGroup": "e2f",
+    "workerBrand": "e2f",
+    "relationship": "Direct e2f corporate/campaign hiring",
+    "portalType": "Managed workforce",
+    "audienceTier": "restricted",
+    "domainTags": [
+      "linguistics",
+      "generalist"
+    ],
+    "typicalWork": "Managed linguist and AI-data workforce, recruited on a campaign-led or direct-sourcing basis.",
+    "workerUrl": "https://www.e2f.com/",
+    "status": "No public worker portal",
+    "accessModel": "Managed linguist and AI-data workforce",
+    "geography": "Language and project dependent",
+    "ownershipConfidence": "Confirmed",
+    "relationshipEvidenceUrl": "https://www.e2f.com/ai-data-1",
+    "statusEvidenceUrl": "https://www.e2f.com/ai-data-1",
+    "lastChecked": "2026-07-18",
+    "notes": "Project recruitment appears to be campaign-led or direct sourcing — no clear evergreen public contributor marketplace found."
+  },
+  {
+    "id": "HP-059",
+    "slug": "kili-technology",
+    "parentGroup": "Kili Technology",
+    "workerBrand": "Kili Technology",
+    "relationship": "Direct Kili Technology corporate hiring",
+    "portalType": "Annotation software plus managed services",
+    "audienceTier": "restricted",
+    "domainTags": [
+      "generalist"
+    ],
+    "typicalWork": "Annotation software plus managed services; contributor sourcing is not publicly exposed.",
+    "workerUrl": "https://kili-technology.com/",
+    "status": "No public worker portal",
+    "accessModel": "Annotation software plus managed services",
+    "geography": "Corporate roles",
+    "ownershipConfidence": "Confirmed",
+    "relationshipEvidenceUrl": "https://kili-technology.com/",
+    "statusEvidenceUrl": "https://kili-technology.com/",
+    "lastChecked": "2026-07-18",
+    "notes": "Primarily a software/platform company; contributor sourcing is not publicly exposed — no public worker marketplace identified. (The /careers path referenced in the source registry now 404s; linked to the homepage instead.)"
+  },
+  {
+    "id": "HP-060",
+    "slug": "encord",
+    "parentGroup": "Encord",
+    "workerBrand": "Encord",
+    "relationship": "Direct Encord corporate hiring",
+    "portalType": "Annotation software plus services",
+    "audienceTier": "restricted",
+    "domainTags": [
+      "generalist"
+    ],
+    "typicalWork": "Primarily enterprise annotation software; no open crowd/tasker route found.",
+    "workerUrl": "https://encord.com/careers/",
+    "status": "No public worker portal",
+    "accessModel": "Annotation software plus services",
+    "geography": "Corporate roles",
+    "ownershipConfidence": "Confirmed",
+    "relationshipEvidenceUrl": "https://encord.com/careers/",
+    "statusEvidenceUrl": "https://encord.com/careers/",
+    "lastChecked": "2026-07-18",
+    "notes": "Primarily enterprise software; no open tasker route found — no public worker marketplace identified."
+  },
+  {
+    "id": "HP-061",
+    "slug": "v7",
+    "parentGroup": "V7",
+    "workerBrand": "V7",
+    "relationship": "Direct V7 corporate hiring",
+    "portalType": "Annotation software plus services",
+    "audienceTier": "restricted",
+    "domainTags": [
+      "generalist"
+    ],
+    "typicalWork": "Primarily enterprise annotation software; no open crowd/tasker route found.",
+    "workerUrl": "https://www.v7labs.com/careers",
+    "status": "No public worker portal",
+    "accessModel": "Annotation software plus services",
+    "geography": "Corporate roles",
+    "ownershipConfidence": "Confirmed",
+    "relationshipEvidenceUrl": "https://www.v7labs.com/careers",
+    "statusEvidenceUrl": "https://www.v7labs.com/careers",
+    "lastChecked": "2026-07-18",
+    "notes": "Primarily enterprise annotation software; no open crowd route found — no public worker marketplace identified."
+  },
+  {
+    "id": "HP-062",
+    "slug": "scale-rapid",
+    "parentGroup": "Scale AI",
+    "workerBrand": "Scale Rapid / Enterprise managed services",
+    "relationship": "Scale AI enterprise managed-services and corporate hiring arm",
+    "portalType": "Managed workforce",
+    "audienceTier": "restricted",
+    "domainTags": [
+      "generalist"
+    ],
+    "typicalWork": "Enterprise managed data-labeling services; worker-facing hiring for Scale AI happens through its separate consumer brands, not this corporate careers page.",
+    "workerUrl": "https://scale.com/careers",
+    "status": "No public worker portal",
+    "accessModel": "Covered by separate worker brands",
+    "geography": "Corporate roles",
+    "ownershipConfidence": "Confirmed",
+    "relationshipEvidenceUrl": "https://scale.com/careers",
+    "statusEvidenceUrl": "https://scale.com/careers",
+    "lastChecked": "2026-07-18",
+    "notes": "Do not send taskers here — use Outlier, Remotasks, or Human Frontier Collective (HFC) instead; those are Scale’s actual worker-facing routes and already have their own listings on HumanSourcer."
   }
 ]

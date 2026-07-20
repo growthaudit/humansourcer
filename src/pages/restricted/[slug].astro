@@ -1,0 +1,47 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { organizationJsonLd, breadcrumbListJsonLd } from '../../lib/jsonld';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import ProviderDetail from '../../components/ProviderDetail.astro';
+
+export async function getStaticPaths() {
+  const all = await getCollection('providers');
+  const restricted = all.filter((p) => p.data.audienceTier === 'restricted');
+  return restricted.map((provider) => ({
+    params: { slug: provider.data.slug },
+    props: { provider },
+  }));
+}
+
+interface Props {
+  provider: CollectionEntry<'providers'>;
+}
+
+const { provider }: Props = Astro.props;
+const p = provider.data;
+
+const profileUrl = new URL(`/restricted/${p.slug}`, Astro.site).toString();
+const breadcrumbItems = [
+  { name: 'Home', url: new URL('/', Astro.site).toString() },
+  { name: 'Managed & restricted-access', url: new URL('/restricted/', Astro.site).toString() },
+  { name: p.workerBrand, url: profileUrl },
+];
+const jsonLd = [organizationJsonLd(p, profileUrl), breadcrumbListJsonLd(breadcrumbItems)];
+
+const title = `${p.workerBrand}: Ownership & Worker Access | HumanSourcer`;
+const description = `${p.workerBrand} — ${p.relationship}. No public self-serve worker portal: ${p.notes ?? p.typicalWork}`;
+---
+
+<Layout title={title} description={description} canonicalPath={`/restricted/${p.slug}`} jsonLd={jsonLd}>
+  <Breadcrumbs items={breadcrumbItems} />
+  <ProviderDetail
+    provider={provider}
+    providerRoles={{ roles: [], totalCount: 0 }}
+    backHref="/restricted/"
+    backLabel="All managed & restricted-access companies"
+    ctaLabel="See official careers page"
+    ctaRel="nofollow"
+    showRoles={false}
+  />
+</Layout>

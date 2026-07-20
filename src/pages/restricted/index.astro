@@ -1,0 +1,51 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { itemListJsonLd } from '../../lib/jsonld';
+
+const allProviders = await getCollection('providers');
+const restricted = allProviders
+  .filter((p) => p.data.audienceTier === 'restricted')
+  .sort((a, b) => a.data.workerBrand.localeCompare(b.data.workerBrand));
+
+const listUrl = new URL('/restricted/', Astro.site).toString();
+const jsonLd = itemListJsonLd(
+  restricted.map((p) => ({
+    name: p.data.workerBrand,
+    url: new URL(`/restricted/${p.data.slug}`, Astro.site).toString(),
+  })),
+  listUrl
+);
+
+const title = 'Managed & Restricted-Access Human-Data Companies | HumanSourcer';
+const description =
+  'Real human-data annotation and AI-training companies (Karya, Innodata, Cogito Tech, Encord, and others) with no public self-serve worker portal — managed or partner-led hiring only.';
+---
+
+<Layout title={title} description={description} canonicalPath="/restricted/" jsonLd={jsonLd}>
+  <h1 class="text-3xl font-bold tracking-tight">Managed &amp; restricted-access companies</h1>
+  <p class="mt-2 max-w-2xl text-slate-600">
+    {restricted.length} real human-data annotation and AI-training companies with no public
+    self-serve worker portal — hiring happens through managed services, partner organisations, or
+    ordinary corporate job vacancies rather than an evergreen contributor signup flow. Listed here
+    for completeness, not as an application funnel.
+  </p>
+  <p class="mt-2 max-w-2xl text-slate-600">
+    Looking for somewhere you can actually apply today? See the
+    <a href="/" class="underline">expert networks</a> or
+    <a href="/gig/" class="underline">gig platforms</a> directories.
+  </p>
+
+  <div class="mt-8 grid gap-4 sm:grid-cols-2">
+    {restricted.map((p) => (
+      <a
+        href={`/restricted/${p.data.slug}`}
+        class="block rounded-lg border border-slate-200 p-4 transition hover:border-slate-400 hover:shadow-sm"
+      >
+        <div class="text-xs uppercase tracking-wide text-slate-400">{p.data.parentGroup}</div>
+        <div class="mt-1 font-medium text-slate-900">{p.data.workerBrand}</div>
+        <p class="mt-1 text-sm text-slate-500">{p.data.typicalWork}</p>
+      </a>
+    ))}
+  </div>
+</Layout>

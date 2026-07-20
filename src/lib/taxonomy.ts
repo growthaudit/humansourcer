@@ -6,9 +6,13 @@
 // spreadsheet sync from crashing on a new phrasing (it just degrades to a
 // reasonable guess instead of throwing).
 
-export type AccessModelCategory = 'open' | 'application' | 'selective' | 'waitlist';
+// 'restricted' covers the audienceTier === 'restricted' companies: no public
+// self-serve application route exists at all (managed/partner-led hiring
+// only), so bucketing them as 'application' or 'active' like every other
+// provider would misrepresent them as having a normal apply flow.
+export type AccessModelCategory = 'open' | 'application' | 'selective' | 'waitlist' | 'restricted';
 export type GeographyScope = 'global' | 'region-restricted' | 'country-specific' | 'role-dependent';
-export type StatusCategory = 'active' | 'limited' | 'waitlist' | 'campaign';
+export type StatusCategory = 'active' | 'limited' | 'waitlist' | 'campaign' | 'restricted';
 export type ConfidenceLevel = 'confirmed' | 'high' | 'medium';
 
 const ACCESS_MODEL_MAP: Record<string, AccessModelCategory> = {
@@ -47,6 +51,16 @@ const ACCESS_MODEL_MAP: Record<string, AccessModelCategory> = {
   'Apply to vacancies / email': 'application',
   'Freelance/vendor application': 'application',
   'Apply to vacancies': 'application',
+
+  // audienceTier === 'restricted' — no public self-serve route.
+  'Workers recruited through local programmes and partner organisations': 'restricted',
+  'Workers recruited and trained through local partner organisations': 'restricted',
+  'Managed workforce and role-by-role hiring': 'restricted',
+  'Managed annotation workforce': 'restricted',
+  'Managed linguist and AI-data workforce': 'restricted',
+  'Annotation software plus managed services': 'restricted',
+  'Annotation software plus services': 'restricted',
+  'Covered by separate worker brands': 'restricted',
 };
 
 const GEOGRAPHY_MAP: Record<string, GeographyScope> = {
@@ -86,6 +100,7 @@ const STATUS_MAP: Record<string, StatusCategory> = {
   'Active / low freshness': 'limited',
   'Active when roles listed': 'limited',
   'Active / emerging': 'active',
+  'No public worker portal': 'restricted',
 };
 
 const CONFIDENCE_MAP: Record<string, ConfidenceLevel> = {
@@ -98,6 +113,7 @@ const CONFIDENCE_MAP: Record<string, ConfidenceLevel> = {
 function keywordFallbackAccess(raw: string): AccessModelCategory {
   const s = raw.toLowerCase();
   if (s.includes('waitlist')) return 'waitlist';
+  if (s.includes('managed') || s.includes('partner') || s.includes('no public')) return 'restricted';
   if (s.includes('selective') || s.includes('assessment') || s.includes('vetted')) return 'selective';
   if (s.includes('open')) return 'open';
   return 'application';
@@ -115,6 +131,7 @@ function keywordFallbackStatus(raw: string): StatusCategory {
   const s = raw.toLowerCase();
   if (s.includes('waitlist')) return 'waitlist';
   if (s.includes('campaign')) return 'campaign';
+  if (s.includes('no public') || s.includes('no self-serve')) return 'restricted';
   if (s.includes('stale') || s.includes('limited') || s.includes('low freshness') || s.includes('wind-down') || s.includes('when roles listed')) return 'limited';
   return 'active';
 }
@@ -147,6 +164,7 @@ export const ACCESS_MODEL_LABELS: Record<AccessModelCategory, string> = {
   application: 'Apply',
   selective: 'Selective / vetted',
   waitlist: 'Waitlist',
+  restricted: 'No public self-serve route',
 };
 
 export const GEOGRAPHY_LABELS: Record<GeographyScope, string> = {
@@ -161,6 +179,7 @@ export const STATUS_LABELS: Record<StatusCategory, string> = {
   limited: 'Limited / caveat',
   waitlist: 'Waitlist',
   campaign: 'Campaign listing',
+  restricted: 'No public worker portal',
 };
 
 export const DOMAIN_TAG_LABELS: Record<string, string> = {

@@ -1,0 +1,170 @@
+---
+// Shared body for all three provider-detail routes (/providers/[slug],
+// /gig/[slug], /restricted/[slug]) — same fields, same JSON-LD shape, only
+// the surrounding tier framing (back-link, CTA copy, whether an "Open
+// roles" section makes sense) differs per tier.
+import {
+  accessModelCategory,
+  geographyScope,
+  statusCategory,
+  confidenceLevel,
+  ACCESS_MODEL_LABELS,
+  GEOGRAPHY_LABELS,
+  STATUS_LABELS,
+  DOMAIN_TAG_LABELS,
+} from '../lib/taxonomy';
+import { rolePagePath, type ProviderRoles } from '../lib/roles';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  provider: CollectionEntry<'providers'>;
+  providerRoles: ProviderRoles;
+  backHref: string;
+  backLabel: string;
+  ctaLabel: string;
+  ctaRel: string;
+  showRoles: boolean;
+}
+
+const { provider, providerRoles, backHref, backLabel, ctaLabel, ctaRel, showRoles }: Props = Astro.props;
+const { roles, totalCount } = providerRoles;
+const p = provider.data;
+
+const access = accessModelCategory(p.accessModel);
+const geo = geographyScope(p.geography);
+const status = statusCategory(p.status);
+const confidence = confidenceLevel(p.ownershipConfidence);
+---
+
+<a href={backHref} class="text-sm text-slate-500 hover:text-slate-800">&larr; {backLabel}</a>
+
+<div class="mt-4 flex items-start justify-between gap-4">
+  <div>
+    <div class="text-sm uppercase tracking-wide text-slate-400">{p.parentGroup}</div>
+    <h1 class="mt-1 text-3xl font-bold tracking-tight">{p.workerBrand}</h1>
+    <p class="mt-2 text-slate-600">{p.relationship}</p>
+  </div>
+  <span class="whitespace-nowrap rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">
+    {STATUS_LABELS[status]}
+  </span>
+</div>
+
+<div class="mt-8 grid gap-6 sm:grid-cols-2">
+  <div class="rounded-lg border border-slate-200 p-4">
+    <div class="text-xs uppercase tracking-wide text-slate-400">Portal type</div>
+    <div class="mt-1 font-medium">{p.portalType}</div>
+  </div>
+  <div class="rounded-lg border border-slate-200 p-4">
+    <div class="text-xs uppercase tracking-wide text-slate-400">Access model</div>
+    <div class="mt-1 font-medium">{ACCESS_MODEL_LABELS[access]}</div>
+    <div class="mt-1 text-sm text-slate-500">{p.accessModel}</div>
+  </div>
+  <div class="rounded-lg border border-slate-200 p-4">
+    <div class="text-xs uppercase tracking-wide text-slate-400">Geography</div>
+    <div class="mt-1 font-medium">{GEOGRAPHY_LABELS[geo]}</div>
+    <div class="mt-1 text-sm text-slate-500">{p.geography}</div>
+  </div>
+  <div class="rounded-lg border border-slate-200 p-4">
+    <div class="text-xs uppercase tracking-wide text-slate-400">Ownership confidence</div>
+    <div class="mt-1 font-medium capitalize">{confidence}</div>
+    <div class="mt-1 text-sm text-slate-500">{p.ownershipConfidence}</div>
+  </div>
+</div>
+
+<div class="mt-8">
+  <h2 class="text-sm uppercase tracking-wide text-slate-400">Typical work</h2>
+  <p class="mt-2 text-slate-700">{p.typicalWork}</p>
+</div>
+
+<div class="mt-6">
+  <h2 class="text-sm uppercase tracking-wide text-slate-400">Domains</h2>
+  <div class="mt-2 flex flex-wrap gap-2">
+    {p.domainTags.map((tag) => (
+      <span class="rounded bg-slate-100 px-2 py-1 text-sm text-slate-700">
+        {DOMAIN_TAG_LABELS[tag] ?? tag}
+      </span>
+    ))}
+  </div>
+</div>
+
+{p.notes && (
+  <div class="mt-6">
+    <h2 class="text-sm uppercase tracking-wide text-slate-400">Notes</h2>
+    <p class="mt-2 text-slate-700">{p.notes}</p>
+  </div>
+)}
+
+{p.aliases && p.aliases.length > 0 && (
+  <div class="mt-6">
+    <h2 class="text-sm uppercase tracking-wide text-slate-400">Formerly known as / related brands</h2>
+    <ul class="mt-2 space-y-2">
+      {p.aliases.map((alias) => (
+        <li class="rounded-lg border border-slate-200 p-3 text-sm">
+          <div class="font-medium text-slate-800">{alias.name}</div>
+          <div class="mt-1 text-slate-500">{alias.aliasType} — {alias.note}</div>
+          <a class="mt-1 inline-block underline text-slate-500" href={alias.evidenceUrl} rel="nofollow">
+            {alias.evidenceUrl}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+
+<div class="mt-10 flex flex-wrap items-center gap-4">
+  <a
+    href={`/go/${p.slug}`}
+    rel={ctaRel}
+    class="rounded-md bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-700"
+  >
+    {ctaLabel} &rarr;
+  </a>
+  <span class="text-xs text-slate-400">Last checked {p.lastChecked.toISOString().slice(0, 10)}</span>
+</div>
+
+{showRoles && roles.length > 0 && (
+  <div class="mt-10">
+    <h2 class="text-sm uppercase tracking-wide text-slate-400">
+      Open roles
+      {totalCount > roles.length
+        ? ` (showing ${roles.length} of ${totalCount})`
+        : ` (${totalCount})`}
+    </h2>
+    {totalCount > roles.length && (
+      <p class="mt-1 text-xs text-slate-400">
+        Showing the most recently updated roles. Visit {p.workerBrand} directly for the full list.
+      </p>
+    )}
+    <div class="mt-3 space-y-3">
+      {roles.map((role) => (
+        <a
+          href={rolePagePath(role)}
+          class="block rounded-lg border border-slate-200 p-4 transition hover:border-slate-400 hover:shadow-sm"
+        >
+          <div class="flex items-start justify-between gap-4">
+            <div class="font-medium">{role.title}</div>
+            {role.pay_text && (
+              <span class="whitespace-nowrap text-sm text-slate-500">{role.pay_text}</span>
+            )}
+          </div>
+          <div class="mt-1 flex flex-wrap gap-2 text-xs text-slate-500">
+            {role.category && <span>{role.category}</span>}
+            {role.location && <span>&middot; {role.location}</span>}
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+)}
+
+<div class="mt-10 border-t border-slate-200 pt-6 text-sm text-slate-500">
+  <h2 class="mb-2 font-semibold text-slate-700">Sources</h2>
+  <ul class="space-y-1">
+    <li>
+      Ownership/relationship: <a class="underline" href={p.relationshipEvidenceUrl} rel="nofollow">{p.relationshipEvidenceUrl}</a>
+    </li>
+    <li>
+      Status: <a class="underline" href={p.statusEvidenceUrl} rel="nofollow">{p.statusEvidenceUrl}</a>
+    </li>
+  </ul>
+</div>

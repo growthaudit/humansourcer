@@ -14,7 +14,11 @@
 import { defineCollection, z } from 'astro:content';
 import { file } from 'astro/loaders';
 
-const AUDIENCE_TIERS = ['expert', 'gig'] as const;
+// 'restricted' = real human-data companies with no public self-serve worker
+// portal (managed/partner-led hiring only) — see providers with this tier
+// for the "why" in their `notes` field. They get lighter-weight pages: no
+// application funnel framing, no /go/ click as a "join" CTA.
+const AUDIENCE_TIERS = ['expert', 'gig', 'restricted'] as const;
 
 const DOMAIN_TAGS = [
   'law', 'medicine', 'finance', 'coding', 'science-stem', 'linguistics',
@@ -62,6 +66,17 @@ const providerSchema = z.object({
   glassdoorEvidenceUrl: z.string().url().optional(),
 
   ratingsLastChecked: z.coerce.date().optional(),
+
+  // Former/legacy names that now redirect into this provider (e.g. "TaskUp"
+  // -> DataAnnotation). Sourced from the registry's "Aliases & Legacy" sheet.
+  // Purely informational — never a separate provider entry or workerUrl.
+  aliases: z.array(z.object({
+    name: z.string(),
+    url: z.string().url(),
+    aliasType: z.string(), // free text, e.g. "Former platform name"
+    note: z.string(),
+    evidenceUrl: z.string().url(),
+  })).optional(),
 });
 
 const providers = defineCollection({

@@ -1,0 +1,81 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { breadcrumbListJsonLd } from '../lib/jsonld';
+
+// Sourced from the registry's "Aggregators" sheet. OpenTrain AI is
+// deliberately excluded here — it already has a full provider profile on
+// this site (it's a real gig-tier employer, not just a discovery source —
+// see src/data/providers.json, opentrain-freelancer-marketplace).
+const boards = [
+  {
+    name: 'AlignList',
+    url: 'https://alignlist.com/',
+    what: 'AI training companies and jobs',
+    caution: 'An independent aggregator, not an employer — validate every listing against the official application page before applying.',
+  },
+  {
+    name: 'AI Work Finder',
+    url: 'https://aiworkfinder.com/',
+    what: 'Remote AI training and annotation jobs',
+    caution: 'Useful for discovering newer or smaller platforms — check how recently a listing was posted before relying on it.',
+  },
+  {
+    name: 'DataAnnotationJobs.org',
+    url: 'https://dataannotationjobs.org/',
+    what: 'Data annotation job listings',
+    caution: 'Its name is easy to confuse with DataAnnotation.tech — it is an unrelated, independent listing site.',
+  },
+  {
+    name: 'Crossing Hurdles',
+    url: 'https://crossinghurdles.com/',
+    what: 'Contributor recruitment and AI-training opportunities',
+    caution: 'Often a recruitment intermediary rather than the end employer — confirm who you would actually be working for before sharing personal details.',
+  },
+  {
+    name: 'RealTrainAI',
+    url: 'https://www.realtrainai.com/',
+    what: 'Matching applicants to AI-training projects',
+    caution: 'An emerging matching platform — corporate transparency is limited, so treat it as a lead to verify, not a confirmed employer.',
+  },
+  {
+    name: 'Careerseeker.ai',
+    url: 'https://careerseeker.ai/data-annotation-jobs/',
+    what: 'Guides and lists of AI-training platforms',
+    caution: 'An editorial discovery source, not an application endpoint — good for finding new platform names, not for applying directly.',
+  },
+];
+
+const title = 'Other AI Training Job Boards & Aggregators | HumanSourcer';
+const description =
+  'Independent job boards and aggregators that also list AI-training and data-annotation work, beyond the providers directly indexed on HumanSourcer.';
+const canonicalPath = '/other-ai-job-boards/';
+const pageUrl = new URL(canonicalPath, Astro.site).toString();
+const breadcrumbItems = [
+  { name: 'Home', url: new URL('/', Astro.site).toString() },
+  { name: 'Other AI job boards', url: pageUrl },
+];
+const jsonLd = breadcrumbListJsonLd(breadcrumbItems);
+---
+
+<Layout title={title} description={description} canonicalPath={canonicalPath} jsonLd={jsonLd}>
+  <h1 class="text-3xl font-bold tracking-tight">Other AI-training job boards</h1>
+  <p class="mt-2 max-w-2xl text-slate-600">
+    HumanSourcer directly indexes and verifies the providers in the
+    <a href="/" class="underline">expert</a> and <a href="/gig/" class="underline">gig</a>
+    directories. These independent sites also surface AI-training and data-annotation work —
+    useful for discovery, but not vetted here the same way, so confirm the actual employer and
+    application endpoint yourself before applying.
+  </p>
+
+  <div class="mt-8 grid gap-4 sm:grid-cols-2">
+    {boards.map((b) => (
+      <div class="rounded-lg border border-slate-200 p-4">
+        <a href={b.url} rel="nofollow noopener" target="_blank" class="font-medium text-slate-900 underline">
+          {b.name}
+        </a>
+        <p class="mt-1 text-sm text-slate-600">{b.what}</p>
+        <p class="mt-2 text-xs text-slate-400">{b.caution}</p>
+      </div>
+    ))}
+  </div>
+</Layout>
