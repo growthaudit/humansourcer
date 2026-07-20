@@ -25,13 +25,13 @@ const description =
 
 <Layout title={title} description={description} canonicalPath="/restricted/" jsonLd={jsonLd}>
   <h1 class="text-3xl font-bold tracking-tight">Managed &amp; restricted-access companies</h1>
-  <p class="mt-2 max-w-2xl text-slate-600">
+  <p class="mt-2 max-w-2xl text-ink-secondary">
     {restricted.length} real human-data annotation and AI-training companies with no public
     self-serve worker portal — hiring happens through managed services, partner organisations, or
     ordinary corporate job vacancies rather than an evergreen contributor signup flow. Listed here
     for completeness, not as an application funnel.
   </p>
-  <p class="mt-2 max-w-2xl text-slate-600">
+  <p class="mt-2 max-w-2xl text-ink-secondary">
     Looking for somewhere you can actually apply today? See the
     <a href="/" class="underline">expert networks</a> or
     <a href="/gig/" class="underline">gig platforms</a> directories.
@@ -41,11 +41,11 @@ const description =
     {restricted.map((p) => (
       <a
         href={providerHref(p.data)}
-        class="block rounded-lg border border-slate-200 p-4 transition hover:border-slate-400 hover:shadow-sm"
+        class="block rounded-lg border border-border p-4 transition-colors duration-200 ease-out hover:border-border-strong hover:shadow-sm"
       >
-        <div class="text-xs uppercase tracking-wide text-slate-400">{p.data.parentGroup}</div>
-        <div class="mt-1 font-medium text-slate-900">{p.data.workerBrand}</div>
-        <p class="mt-1 text-sm text-slate-500">{p.data.typicalWork}</p>
+        <div class="text-xs uppercase tracking-wide text-ink-tertiary">{p.data.parentGroup}</div>
+        <div class="mt-1 font-medium text-ink-primary">{p.data.workerBrand}</div>
+        <p class="mt-1 text-sm text-ink-secondary">{p.data.typicalWork}</p>
       </a>
     ))}
   </div>

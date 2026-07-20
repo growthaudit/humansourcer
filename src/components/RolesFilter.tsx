@@ -97,12 +97,12 @@ export default function RolesFilter({ roles }: Props) {
           value={query}
           onInput={(e) => setQuery((e.target as HTMLInputElement).value)}
           placeholder="Search roles..."
-          class="rounded border border-slate-300 px-3 py-2 text-sm"
+          class="rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink-primary"
           aria-label="Search roles"
         />
 
         <select
-          class="rounded border border-slate-300 px-3 py-2 text-sm"
+          class="rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink-primary"
           value={domain}
           onChange={(e) => setDomain((e.target as HTMLSelectElement).value)}
           aria-label="Filter by domain"
@@ -114,7 +114,7 @@ export default function RolesFilter({ roles }: Props) {
         </select>
 
         <select
-          class="rounded border border-slate-300 px-3 py-2 text-sm"
+          class="rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink-primary"
           value={company}
           onChange={(e) => setCompany((e.target as HTMLSelectElement).value)}
           aria-label="Filter by company"
@@ -126,7 +126,7 @@ export default function RolesFilter({ roles }: Props) {
         </select>
 
         <select
-          class="rounded border border-slate-300 px-3 py-2 text-sm"
+          class="rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink-primary"
           value={task}
           onChange={(e) => setTask((e.target as HTMLSelectElement).value)}
           aria-label="Filter by task type"
@@ -138,7 +138,7 @@ export default function RolesFilter({ roles }: Props) {
         </select>
 
         <select
-          class="rounded border border-slate-300 px-3 py-2 text-sm"
+          class="rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink-primary"
           value={location}
           onChange={(e) => setLocation((e.target as HTMLSelectElement).value)}
           aria-label="Filter by location"
@@ -150,7 +150,7 @@ export default function RolesFilter({ roles }: Props) {
         </select>
 
         <select
-          class="rounded border border-slate-300 px-3 py-2 text-sm"
+          class="rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink-primary"
           value={pay}
           onChange={(e) => setPay((e.target as HTMLSelectElement).value)}
           aria-label="Filter by pay"
@@ -161,7 +161,7 @@ export default function RolesFilter({ roles }: Props) {
           ))}
         </select>
 
-        <span class="self-center text-sm text-slate-500">
+        <span class="self-center text-sm text-ink-secondary">
           {filtered.length} of {roles.length} roles
         </span>
       </div>
@@ -170,13 +170,13 @@ export default function RolesFilter({ roles }: Props) {
         {filtered.map((r) => (
           <a
             href={r.href}
-            class="block rounded-lg border border-slate-200 p-4 transition hover:border-slate-400 hover:shadow-sm"
+            class="block rounded-lg border border-border p-4 transition-colors duration-200 ease-out hover:border-border-strong hover:shadow-sm"
           >
             <div class="flex items-start justify-between gap-4">
-              <div class="font-medium">{r.title}</div>
-              {r.payText && <span class="whitespace-nowrap text-sm text-slate-500">{r.payText}</span>}
+              <div class="font-medium text-ink-primary">{r.title}</div>
+              {r.payText && <span class="whitespace-nowrap text-sm text-ink-secondary">{r.payText}</span>}
             </div>
-            <div class="mt-1 flex flex-wrap gap-2 text-xs text-slate-500">
+            <div class="mt-1 flex flex-wrap gap-2 text-xs text-ink-tertiary">
               <span>{r.workerBrand}</span>
               <span>&middot; {TASK_TYPE_LABELS[r.taskType]}</span>
               <span>&middot; {LOCATION_BUCKET_LABELS[r.locationBucket]}</span>
@@ -185,7 +185,7 @@ export default function RolesFilter({ roles }: Props) {
         ))}
       </div>
 
-      {filtered.length === 0 && <p class="py-12 text-center text-slate-500">No roles match those filters.</p>}
+      {filtered.length === 0 && <p class="py-12 text-center text-ink-secondary">No roles match those filters.</p>}
     </div>
   );
 }

@@ -36,51 +36,51 @@ const status = statusCategory(p.status);
 const confidence = confidenceLevel(p.ownershipConfidence);
 ---
 
-<a href={backHref} class="text-sm text-slate-500 hover:text-slate-800">&larr; {backLabel}</a>
+<a href={backHref} class="text-sm text-ink-secondary transition-colors duration-200 ease-out hover:text-ink-primary">&larr; {backLabel}</a>
 
 <div class="mt-4 flex items-start justify-between gap-4">
   <div>
-    <div class="text-sm uppercase tracking-wide text-slate-400">{p.parentGroup}</div>
+    <div class="text-sm uppercase tracking-wide text-ink-tertiary">{p.parentGroup}</div>
     <h1 class="mt-1 text-3xl font-bold tracking-tight">{p.workerBrand}</h1>
-    <p class="mt-2 text-slate-600">{p.relationship}</p>
+    <p class="mt-2 text-ink-secondary">{p.relationship}</p>
   </div>
-  <span class="whitespace-nowrap rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">
+  <span class="whitespace-nowrap rounded-full bg-surface-raised px-3 py-1 text-sm font-medium text-ink-secondary">
     {STATUS_LABELS[status]}
   </span>
 </div>
 
 <div class="mt-8 grid gap-6 sm:grid-cols-2">
-  <div class="rounded-lg border border-slate-200 p-4">
-    <div class="text-xs uppercase tracking-wide text-slate-400">Portal type</div>
+  <div class="rounded-lg border border-border p-4">
+    <div class="text-xs uppercase tracking-wide text-ink-tertiary">Portal type</div>
     <div class="mt-1 font-medium">{p.portalType}</div>
   </div>
-  <div class="rounded-lg border border-slate-200 p-4">
-    <div class="text-xs uppercase tracking-wide text-slate-400">Access model</div>
+  <div class="rounded-lg border border-border p-4">
+    <div class="text-xs uppercase tracking-wide text-ink-tertiary">Access model</div>
     <div class="mt-1 font-medium">{ACCESS_MODEL_LABELS[access]}</div>
-    <div class="mt-1 text-sm text-slate-500">{p.accessModel}</div>
+    <div class="mt-1 text-sm text-ink-secondary">{p.accessModel}</div>
   </div>
-  <div class="rounded-lg border border-slate-200 p-4">
-    <div class="text-xs uppercase tracking-wide text-slate-400">Geography</div>
+  <div class="rounded-lg border border-border p-4">
+    <div class="text-xs uppercase tracking-wide text-ink-tertiary">Geography</div>
     <div class="mt-1 font-medium">{GEOGRAPHY_LABELS[geo]}</div>
-    <div class="mt-1 text-sm text-slate-500">{p.geography}</div>
+    <div class="mt-1 text-sm text-ink-secondary">{p.geography}</div>
   </div>
-  <div class="rounded-lg border border-slate-200 p-4">
-    <div class="text-xs uppercase tracking-wide text-slate-400">Ownership confidence</div>
+  <div class="rounded-lg border border-border p-4">
+    <div class="text-xs uppercase tracking-wide text-ink-tertiary">Ownership confidence</div>
     <div class="mt-1 font-medium capitalize">{confidence}</div>
-    <div class="mt-1 text-sm text-slate-500">{p.ownershipConfidence}</div>
+    <div class="mt-1 text-sm text-ink-secondary">{p.ownershipConfidence}</div>
   </div>
 </div>
 
 <div class="mt-8">
-  <h2 class="text-sm uppercase tracking-wide text-slate-400">Typical work</h2>
-  <p class="mt-2 text-slate-700">{p.typicalWork}</p>
+  <h2 class="text-sm uppercase tracking-wide text-ink-tertiary">Typical work</h2>
+  <p class="mt-2 text-ink-secondary">{p.typicalWork}</p>
 </div>
 
 <div class="mt-6">
-  <h2 class="text-sm uppercase tracking-wide text-slate-400">Domains</h2>
+  <h2 class="text-sm uppercase tracking-wide text-ink-tertiary">Domains</h2>
   <div class="mt-2 flex flex-wrap gap-2">
     {p.domainTags.map((tag) => (
-      <span class="rounded bg-slate-100 px-2 py-1 text-sm text-slate-700">
+      <span class="rounded bg-surface-raised px-2 py-1 text-sm text-ink-secondary">
         {DOMAIN_TAG_LABELS[tag] ?? tag}
       </span>
     ))}
@@ -89,20 +89,20 @@ const confidence = confidenceLevel(p.ownershipConfidence);
 
 {p.notes && (
   <div class="mt-6">
-    <h2 class="text-sm uppercase tracking-wide text-slate-400">Notes</h2>
-    <p class="mt-2 text-slate-700">{p.notes}</p>
+    <h2 class="text-sm uppercase tracking-wide text-ink-tertiary">Notes</h2>
+    <p class="mt-2 text-ink-secondary">{p.notes}</p>
   </div>
 )}
 
 {p.aliases && p.aliases.length > 0 && (
   <div class="mt-6">
-    <h2 class="text-sm uppercase tracking-wide text-slate-400">Formerly known as / related brands</h2>
+    <h2 class="text-sm uppercase tracking-wide text-ink-tertiary">Formerly known as / related brands</h2>
     <ul class="mt-2 space-y-2">
       {p.aliases.map((alias) => (
-        <li class="rounded-lg border border-slate-200 p-3 text-sm">
-          <div class="font-medium text-slate-800">{alias.name}</div>
-          <div class="mt-1 text-slate-500">{alias.aliasType} — {alias.note}</div>
-          <a class="mt-1 inline-block underline text-slate-500" href={alias.evidenceUrl} rel="nofollow">
+        <li class="rounded-lg border border-border p-3 text-sm">
+          <div class="font-medium text-ink-primary">{alias.name}</div>
+          <div class="mt-1 text-ink-secondary">{alias.aliasType} — {alias.note}</div>
+          <a class="mt-1 inline-block underline text-ink-secondary" href={alias.evidenceUrl} rel="nofollow">
             {alias.evidenceUrl}
           </a>
         </li>
@@ -119,19 +119,19 @@ const confidence = confidenceLevel(p.ownershipConfidence);
   >
     {ctaLabel} &rarr;
   </a>
-  <span class="text-xs text-slate-400">Last checked {p.lastChecked.toISOString().slice(0, 10)}</span>
+  <span class="text-xs text-ink-tertiary">Last checked {p.lastChecked.toISOString().slice(0, 10)}</span>
 </div>
 
 {showRoles && roles.length > 0 && (
   <div class="mt-10">
-    <h2 class="text-sm uppercase tracking-wide text-slate-400">
+    <h2 class="text-sm uppercase tracking-wide text-ink-tertiary">
       Open roles
       {totalCount > roles.length
         ? ` (showing ${roles.length} of ${totalCount})`
         : ` (${totalCount})`}
     </h2>
     {totalCount > roles.length && (
-      <p class="mt-1 text-xs text-slate-400">
+      <p class="mt-1 text-xs text-ink-tertiary">
         Showing the most recently updated roles. Visit {p.workerBrand} directly for the full list.
       </p>
     )}
@@ -139,15 +139,15 @@ const confidence = confidenceLevel(p.ownershipConfidence);
       {roles.map((role) => (
         <a
           href={rolePagePath(role)}
-          class="block rounded-lg border border-slate-200 p-4 transition hover:border-slate-400 hover:shadow-sm"
+          class="block rounded-lg border border-border p-4 transition-colors duration-200 ease-out hover:border-border-strong hover:shadow-sm"
         >
           <div class="flex items-start justify-between gap-4">
             <div class="font-medium">{role.title}</div>
             {role.pay_text && (
-              <span class="whitespace-nowrap text-sm text-slate-500">{role.pay_text}</span>
+              <span class="whitespace-nowrap text-sm text-ink-secondary">{role.pay_text}</span>
             )}
           </div>
-          <div class="mt-1 flex flex-wrap gap-2 text-xs text-slate-500">
+          <div class="mt-1 flex flex-wrap gap-2 text-xs text-ink-tertiary">
             {role.category && <span>{role.category}</span>}
             {role.location && <span>&middot; {role.location}</span>}
           </div>
@@ -157,8 +157,8 @@ const confidence = confidenceLevel(p.ownershipConfidence);
   </div>
 )}
 
-<div class="mt-10 border-t border-slate-200 pt-6 text-sm text-slate-500">
-  <h2 class="mb-2 font-semibold text-slate-700">Sources</h2>
+<div class="mt-10 border-t border-border pt-6 text-sm text-ink-secondary">
+  <h2 class="mb-2 font-semibold text-ink-primary">Sources</h2>
   <ul class="space-y-1">
     <li>
       Ownership/relationship: <a class="underline" href={p.relationshipEvidenceUrl} rel="nofollow">{p.relationshipEvidenceUrl}</a>

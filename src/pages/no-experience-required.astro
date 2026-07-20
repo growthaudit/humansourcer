@@ -79,7 +79,7 @@ const description = `${openAccess.length} AI-training networks with open, self-s
 <Layout title={title} description={description} canonicalPath={canonicalPath} jsonLd={jsonLd}>
   <Breadcrumbs items={breadcrumbItems} />
   <h1 class="text-3xl font-bold tracking-tight">AI training platforms with no experience required</h1>
-  <p class="mt-2 max-w-2xl text-slate-600">
+  <p class="mt-2 max-w-2xl text-ink-secondary">
     {openAccess.length} of {experts.length} expert-tier AI-training networks HumanSourcer tracks use open,
     self-serve registration — no selective interview or portfolio review to apply. That's a claim about the
     <em>application process</em>, not about skill: domain-specific networks still expect real subject-matter fit
@@ -89,15 +89,15 @@ const description = `${openAccess.length} AI-training networks with open, self-s
   {generalistPicks.length > 0 && (
     <div class="mt-10">
       <h2 class="text-xl font-semibold tracking-tight">Best for true beginners: open + generalist</h2>
-      <p class="mt-1 text-sm text-slate-500">Open registration and non-specialist work — no professional credential expected.</p>
+      <p class="mt-1 text-sm text-ink-secondary">Open registration and non-specialist work — no professional credential expected.</p>
       <div class="mt-4 grid gap-4 sm:grid-cols-2">
         {generalistPicks.map((p) => (
-          <a href={p.href} class="block rounded-lg border border-slate-200 p-4 transition hover:border-slate-400 hover:shadow-sm">
-            <div class="text-xs uppercase tracking-wide text-slate-400">{p.parentGroup}</div>
+          <a href={p.href} class="block rounded-lg border border-border p-4 transition-colors duration-200 ease-out hover:border-border-strong hover:shadow-sm">
+            <div class="text-xs uppercase tracking-wide text-ink-tertiary">{p.parentGroup}</div>
             <div class="mt-1 font-medium">{p.workerBrand}</div>
-            <p class="mt-1 text-sm text-slate-600">{p.typicalWork}</p>
+            <p class="mt-1 text-sm text-ink-secondary">{p.typicalWork}</p>
             {p.openRoleCount > 0 && (
-              <div class="mt-2 text-xs text-slate-500">{p.openRoleCount} open roles listed now</div>
+              <div class="mt-2 text-xs text-ink-tertiary">{p.openRoleCount} open roles listed now</div>
             )}
           </a>
         ))}
@@ -108,22 +108,22 @@ const description = `${openAccess.length} AI-training networks with open, self-s
   {domainSpecificPicks.length > 0 && (
     <div class="mt-10">
       <h2 class="text-xl font-semibold tracking-tight">Open registration, domain-specific work</h2>
-      <p class="mt-1 text-sm text-slate-500">
+      <p class="mt-1 text-sm text-ink-secondary">
         No selective vetting to apply, but roles expect fit with a specific domain — check the tags before you register.
       </p>
       <div class="mt-4 grid gap-4 sm:grid-cols-2">
         {domainSpecificPicks.map((p) => (
-          <a href={p.href} class="block rounded-lg border border-slate-200 p-4 transition hover:border-slate-400 hover:shadow-sm">
-            <div class="text-xs uppercase tracking-wide text-slate-400">{p.parentGroup}</div>
+          <a href={p.href} class="block rounded-lg border border-border p-4 transition-colors duration-200 ease-out hover:border-border-strong hover:shadow-sm">
+            <div class="text-xs uppercase tracking-wide text-ink-tertiary">{p.parentGroup}</div>
             <div class="mt-1 font-medium">{p.workerBrand}</div>
-            <p class="mt-1 text-sm text-slate-600">{p.typicalWork}</p>
+            <p class="mt-1 text-sm text-ink-secondary">{p.typicalWork}</p>
             <div class="mt-2 flex flex-wrap gap-1">
               {p.domainTags.map((tag) => (
-                <span class="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-600">{DOMAIN_TAG_LABELS[tag] ?? tag}</span>
+                <span class="rounded bg-surface-raised px-2 py-0.5 text-xs text-ink-secondary">{DOMAIN_TAG_LABELS[tag] ?? tag}</span>
               ))}
             </div>
             {p.openRoleCount > 0 && (
-              <div class="mt-2 text-xs text-slate-500">{p.openRoleCount} open roles listed now</div>
+              <div class="mt-2 text-xs text-ink-tertiary">{p.openRoleCount} open roles listed now</div>
             )}
           </a>
         ))}
@@ -131,7 +131,7 @@ const description = `${openAccess.length} AI-training networks with open, self-s
     </div>
   )}
 
-  <p class="mt-10 max-w-2xl text-slate-600">
+  <p class="mt-10 max-w-2xl text-ink-secondary">
     Want the full picture, including selective and application-based networks? See the
     <a href="/" class="underline">full expert AI-training network directory</a> or
     <a href="/roles/" class="underline">browse all open roles</a> directly.

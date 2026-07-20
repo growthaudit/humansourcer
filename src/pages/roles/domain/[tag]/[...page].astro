@@ -52,10 +52,10 @@ const description = `${stats.totalRoles} open ${label.toLowerCase()} roles acros
 <Layout title={title} description={description} canonicalPath={canonicalPath} jsonLd={jsonLd}>
   <Breadcrumbs items={breadcrumbItems} />
   <h1 class="text-3xl font-bold tracking-tight">{label} roles</h1>
-  <p class="mt-2 max-w-2xl font-medium text-slate-800">
+  <p class="mt-2 max-w-2xl font-medium text-ink-primary">
     {stats.totalRoles} open {label.toLowerCase()} roles are currently listed across {stats.companies.length} AI-training networks.
   </p>
-  <p class="mt-2 max-w-2xl text-slate-600">{blurb}</p>
+  <p class="mt-2 max-w-2xl text-ink-secondary">{blurb}</p>
 
   <div class="mt-8">
     <RolesFilter roles={rows} client:load />
@@ -64,11 +64,11 @@ const description = `${stats.totalRoles} open ${label.toLowerCase()} roles acros
   {page.lastPage > 1 && (
     <nav class="mt-8 flex items-center justify-between text-sm" aria-label="Pagination">
       {page.url.prev ? (
-        <a href={page.url.prev} class="text-slate-600 hover:text-slate-900">&larr; Newer</a>
+        <a href={page.url.prev} class="text-ink-secondary transition-colors duration-200 ease-out hover:text-ink-primary">&larr; Newer</a>
       ) : <span />}
-      <span class="text-slate-400">Page {page.currentPage} of {page.lastPage}</span>
+      <span class="text-ink-tertiary">Page {page.currentPage} of {page.lastPage}</span>
       {page.url.next ? (
-        <a href={page.url.next} class="text-slate-600 hover:text-slate-900">Older &rarr;</a>
+        <a href={page.url.next} class="text-ink-secondary transition-colors duration-200 ease-out hover:text-ink-primary">Older &rarr;</a>
       ) : <span />}
     </nav>
   )}

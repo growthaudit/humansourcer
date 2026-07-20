@@ -59,7 +59,7 @@ const jsonLd = breadcrumbListJsonLd(breadcrumbItems);
 
 <Layout title={title} description={description} canonicalPath={canonicalPath} jsonLd={jsonLd}>
   <h1 class="text-3xl font-bold tracking-tight">Other AI-training job boards</h1>
-  <p class="mt-2 max-w-2xl text-slate-600">
+  <p class="mt-2 max-w-2xl text-ink-secondary">
     HumanSourcer directly indexes and verifies the providers in the
     <a href="/" class="underline">expert</a> and <a href="/gig/" class="underline">gig</a>
     directories. These independent sites also surface AI-training and data-annotation work —
@@ -69,12 +69,12 @@ const jsonLd = breadcrumbListJsonLd(breadcrumbItems);
 
   <div class="mt-8 grid gap-4 sm:grid-cols-2">
     {boards.map((b) => (
-      <div class="rounded-lg border border-slate-200 p-4">
-        <a href={b.url} rel="nofollow noopener" target="_blank" class="font-medium text-slate-900 underline">
+      <div class="rounded-lg border border-border p-4">
+        <a href={b.url} rel="nofollow noopener" target="_blank" class="font-medium text-ink-primary underline">
           {b.name}
         </a>
-        <p class="mt-1 text-sm text-slate-600">{b.what}</p>
-        <p class="mt-2 text-xs text-slate-400">{b.caution}</p>
+        <p class="mt-1 text-sm text-ink-secondary">{b.what}</p>
+        <p class="mt-2 text-xs text-ink-tertiary">{b.caution}</p>
       </div>
     ))}
   </div>

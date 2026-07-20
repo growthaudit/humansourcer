@@ -45,7 +45,7 @@ const description = `Browse ${page.total} open roles across HumanSourcer's exper
 <Layout title={title} description={description} canonicalPath={canonicalPath} jsonLd={jsonLd}>
   <Breadcrumbs items={breadcrumbItems} />
   <h1 class="text-3xl font-bold tracking-tight">Open roles</h1>
-  <p class="mt-2 max-w-2xl text-slate-600">
+  <p class="mt-2 max-w-2xl text-ink-secondary">
     {page.total} open roles scraped daily across HumanSourcer's expert-tier AI-training networks.
   </p>
 
@@ -56,11 +56,11 @@ const description = `Browse ${page.total} open roles across HumanSourcer's exper
   {page.lastPage > 1 && (
     <nav class="mt-8 flex items-center justify-between text-sm" aria-label="Pagination">
       {page.url.prev ? (
-        <a href={page.url.prev} class="text-slate-600 hover:text-slate-900">&larr; Newer</a>
+        <a href={page.url.prev} class="text-ink-secondary transition-colors duration-200 ease-out hover:text-ink-primary">&larr; Newer</a>
       ) : <span />}
-      <span class="text-slate-400">Page {page.currentPage} of {page.lastPage}</span>
+      <span class="text-ink-tertiary">Page {page.currentPage} of {page.lastPage}</span>
       {page.url.next ? (
-        <a href={page.url.next} class="text-slate-600 hover:text-slate-900">Older &rarr;</a>
+        <a href={page.url.next} class="text-ink-secondary transition-colors duration-200 ease-out hover:text-ink-primary">Older &rarr;</a>
       ) : <span />}
     </nav>
   )}

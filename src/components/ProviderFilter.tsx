@@ -65,7 +65,7 @@ export default function ProviderFilter({ providers }: Props) {
     <div>
       <div class="mb-6 flex flex-wrap gap-3">
         <select
-          class="rounded border border-slate-300 px-3 py-2 text-sm"
+          class="rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink-primary"
           value={tier}
           onChange={(e) => setTier((e.target as HTMLSelectElement).value)}
           aria-label="Filter by tier"
@@ -77,7 +77,7 @@ export default function ProviderFilter({ providers }: Props) {
         </select>
 
         <select
-          class="rounded border border-slate-300 px-3 py-2 text-sm"
+          class="rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink-primary"
           value={domain}
           onChange={(e) => setDomain((e.target as HTMLSelectElement).value)}
           aria-label="Filter by domain"
@@ -89,7 +89,7 @@ export default function ProviderFilter({ providers }: Props) {
         </select>
 
         <select
-          class="rounded border border-slate-300 px-3 py-2 text-sm"
+          class="rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink-primary"
           value={access}
           onChange={(e) => setAccess((e.target as HTMLSelectElement).value)}
           aria-label="Filter by access model"
@@ -101,7 +101,7 @@ export default function ProviderFilter({ providers }: Props) {
         </select>
 
         <select
-          class="rounded border border-slate-300 px-3 py-2 text-sm"
+          class="rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink-primary"
           value={geo}
           onChange={(e) => setGeo((e.target as HTMLSelectElement).value)}
           aria-label="Filter by geography"
@@ -113,7 +113,7 @@ export default function ProviderFilter({ providers }: Props) {
         </select>
 
         <select
-          class="rounded border border-slate-300 px-3 py-2 text-sm"
+          class="rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink-primary"
           value={sort}
           onChange={(e) => setSort((e.target as HTMLSelectElement).value as SortKey)}
           aria-label="Sort by"
@@ -122,7 +122,7 @@ export default function ProviderFilter({ providers }: Props) {
           <option value="parent">Sort: Parent company</option>
         </select>
 
-        <span class="self-center text-sm text-slate-500">
+        <span class="self-center text-sm text-ink-secondary">
           {filtered.length} of {providers.length} networks
         </span>
       </div>
@@ -131,19 +131,19 @@ export default function ProviderFilter({ providers }: Props) {
         {filtered.map((p) => (
           <a
             href={p.href}
-            class="block rounded-lg border border-slate-200 p-4 transition hover:border-slate-400 hover:shadow-sm"
+            class="block rounded-lg border border-border p-4 transition-colors duration-200 ease-out hover:border-border-strong hover:shadow-sm"
           >
             <div class="flex items-center justify-between gap-2">
-              <div class="text-xs uppercase tracking-wide text-slate-400">{p.parentGroup}</div>
-              <span class="whitespace-nowrap rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-500">
+              <div class="text-xs uppercase tracking-wide text-ink-tertiary">{p.parentGroup}</div>
+              <span class="whitespace-nowrap rounded bg-surface-raised px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-ink-secondary">
                 {p.audienceTiers.map((t) => TIER_LABELS[t]).join(' + ')}
               </span>
             </div>
             <div class="mt-1 font-semibold">{p.workerBrand}</div>
-            <p class="mt-2 line-clamp-2 text-sm text-slate-600">{p.typicalWork}</p>
+            <p class="mt-2 line-clamp-2 text-sm text-ink-secondary">{p.typicalWork}</p>
             <div class="mt-3 flex flex-wrap gap-1">
               {p.domainTags.slice(0, 3).map((tag) => (
-                <span class="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
+                <span class="rounded bg-surface-raised px-2 py-0.5 text-xs text-ink-secondary">
                   {DOMAIN_TAG_LABELS[tag] ?? tag}
                 </span>
               ))}
@@ -153,7 +153,7 @@ export default function ProviderFilter({ providers }: Props) {
       </div>
 
       {filtered.length === 0 && (
-        <p class="py-12 text-center text-slate-500">No networks match those filters.</p>
+        <p class="py-12 text-center text-ink-secondary">No networks match those filters.</p>
       )}
     </div>
   );

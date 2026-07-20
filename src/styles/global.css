@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Site is dark-only by design; without this, native <select>/<input>
+   popups and scrollbars still render with light OS chrome. */
+:root {
+  color-scheme: dark;
+}
+
 /*
  * Design tokens — Human Sourcer
  * Accent hue (258) sampled from the brand assets in /images (mark, hero
