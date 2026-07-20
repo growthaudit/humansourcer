@@ -30,6 +30,12 @@ async function main() {
     title: job.title,
     description: (job.short_description ?? '').slice(0, 2000),
     pay_text: formatPay(job.remuneration),
+    // Structured numeric pay, kept alongside the formatted pay_text above —
+    // this is what powers JobPosting.baseSalary (see src/lib/jsonld.ts).
+    pay_min: job.remuneration?.min_value ?? null,
+    pay_max: job.remuneration?.max_value ?? null,
+    pay_currency: job.remuneration?.min_value != null ? 'USD' : null,
+    pay_unit: job.remuneration?.unit ?? null, // raw 'HOURLY' | 'PER_PACKAGE'
     location: null,
     category: job.knowledge_area ?? job.domain ?? null,
     apply_url: 'https://work.vetto.ai/opportunities',

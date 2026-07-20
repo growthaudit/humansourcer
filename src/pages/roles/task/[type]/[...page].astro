@@ -1,0 +1,66 @@
+---
+import type { GetStaticPathsOptions, Page } from 'astro';
+import Layout from '../../../../layouts/Layout.astro';
+import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
+import RolesFilter from '../../../../components/RolesFilter';
+import { getEligibleActiveRoles, groupByTaskType, toRoleRow, type RoleWithProvider } from '../../../../lib/role-rows';
+import { itemListJsonLd, breadcrumbListJsonLd } from '../../../../lib/jsonld';
+import { TASK_TYPE_LABELS } from '../../../../lib/role-taxonomy';
+
+export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
+  const PAGE_SIZE = 24;
+  const eligible = await getEligibleActiveRoles();
+  const byTask = groupByTaskType(eligible);
+  return [...byTask.entries()].flatMap(([type, items]) =>
+    paginate(items, { params: { type }, pageSize: PAGE_SIZE })
+  );
+}
+
+interface Props {
+  page: Page<RoleWithProvider>;
+}
+
+const { type } = Astro.params;
+const { page } = Astro.props;
+const rows = page.data.map(({ role, provider }) => toRoleRow(role, provider));
+const label = TASK_TYPE_LABELS[type as keyof typeof TASK_TYPE_LABELS] ?? type;
+
+const canonicalPath = page.currentPage === 1 ? `/roles/task/${type}/` : `/roles/task/${type}/${page.currentPage}/`;
+const pageUrl = new URL(canonicalPath, Astro.site).toString();
+
+const breadcrumbItems = [
+  { name: 'Home', url: new URL('/', Astro.site).toString() },
+  { name: 'Roles', url: new URL('/roles/', Astro.site).toString() },
+  { name: label as string, url: new URL(`/roles/task/${type}/`, Astro.site).toString() },
+];
+
+const jsonLd = [
+  breadcrumbListJsonLd(breadcrumbItems),
+  itemListJsonLd(rows.map((r) => ({ name: r.title, url: new URL(r.href, Astro.site).toString() })), pageUrl),
+];
+
+const title = `${label} roles across AI-training networks | HumanSourcer`;
+const description = `${page.total} open ${String(label).toLowerCase()} roles across HumanSourcer's expert AI-training networks.`;
+---
+
+<Layout title={title} description={description} canonicalPath={canonicalPath} jsonLd={jsonLd}>
+  <Breadcrumbs items={breadcrumbItems} />
+  <h1 class="text-3xl font-bold tracking-tight">{label} roles</h1>
+  <p class="mt-2 max-w-2xl text-slate-600">{page.total} open {String(label).toLowerCase()} roles across expert-tier AI-training networks.</p>
+
+  <div class="mt-8">
+    <RolesFilter roles={rows} client:load />
+  </div>
+
+  {page.lastPage > 1 && (
+    <nav class="mt-8 flex items-center justify-between text-sm" aria-label="Pagination">
+      {page.url.prev ? (
+        <a href={page.url.prev} class="text-slate-600 hover:text-slate-900">&larr; Newer</a>
+      ) : <span />}
+      <span class="text-slate-400">Page {page.currentPage} of {page.lastPage}</span>
+      {page.url.next ? (
+        <a href={page.url.next} class="text-slate-600 hover:text-slate-900">Older &rarr;</a>
+      ) : <span />}
+    </nav>
+  )}
+</Layout>

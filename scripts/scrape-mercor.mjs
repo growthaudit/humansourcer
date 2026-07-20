@@ -41,6 +41,12 @@ async function main() {
         : job.rateMin
           ? `$${job.rateMin}/${job.payRateFrequency ?? 'hr'}`
           : null,
+    // Structured numeric pay, kept alongside the formatted pay_text above —
+    // this is what powers JobPosting.baseSalary (see src/lib/jsonld.ts).
+    pay_min: job.rateMin ?? null,
+    pay_max: job.rateMax ?? null,
+    pay_currency: job.rateMin != null ? 'USD' : null,
+    pay_unit: job.payRateFrequency ?? null, // raw, source defaults to 'hr'
     location: null,
     category: null,
     apply_url: 'https://www.mercor.com/experts/',

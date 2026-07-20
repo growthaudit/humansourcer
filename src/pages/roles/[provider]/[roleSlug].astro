@@ -1,0 +1,157 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { getAllRolesForPages, rolePagePath, roleSlug, type FullRole } from '../../../lib/roles';
+import { breadcrumbListJsonLd, jobPostingJsonLd } from '../../../lib/jsonld';
+import { composeRoleDescription } from '../../../lib/role-description';
+import {
+  taskType,
+  locationBucket,
+  payBand,
+  TASK_TYPE_LABELS,
+  LOCATION_BUCKET_LABELS,
+  PAY_BAND_LABELS,
+} from '../../../lib/role-taxonomy';
+import { geographyScope, DOMAIN_TAG_LABELS } from '../../../lib/taxonomy';
+
+type Provider = CollectionEntry<'providers'>['data'];
+
+export async function getStaticPaths() {
+  const allRoles = await getAllRolesForPages();
+  const providers = await getCollection('providers');
+  const expertProviders = new Map(
+    providers.filter((p) => p.data.audienceTier === 'expert').map((p) => [p.data.slug, p.data])
+  );
+  const eligibleRoles = allRoles.filter((r) => expertProviders.has(r.provider_slug));
+
+  return eligibleRoles.map((role) => {
+    const provider = expertProviders.get(role.provider_slug) as Provider;
+    const similarRoles = role.is_active
+      ? []
+      : eligibleRoles
+          .filter(
+            (r) =>
+              r.is_active &&
+              r.id !== role.id &&
+              (r.provider_slug === role.provider_slug || taskType(r) === taskType(role))
+          )
+          .slice(0, 5);
+
+    return {
+      params: {
+        provider: role.provider_slug,
+        roleSlug: roleSlug(role.title, role.provider_slug, role.source_role_id),
+      },
+      props: { role, provider, similarRoles },
+    };
+  });
+}
+
+interface Props {
+  role: FullRole;
+  provider: Provider;
+  similarRoles: FullRole[];
+}
+
+const { role, provider, similarRoles }: Props = Astro.props;
+
+const path = rolePagePath(role);
+const roleUrl = new URL(path, Astro.site).toString();
+const providerUrl = new URL(`/providers/${provider.slug}`, Astro.site).toString();
+
+const breadcrumbItems = [
+  { name: 'Home', url: new URL('/', Astro.site).toString() },
+  { name: 'Roles', url: new URL('/roles/', Astro.site).toString() },
+  { name: provider.workerBrand, url: providerUrl },
+  { name: role.title, url: roleUrl },
+];
+
+const jsonLd = role.is_active
+  ? [breadcrumbListJsonLd(breadcrumbItems), jobPostingJsonLd(role, provider, roleUrl)]
+  : [breadcrumbListJsonLd(breadcrumbItems)];
+
+const description = composeRoleDescription(role, provider);
+const title = role.is_active
+  ? `${role.title} at ${provider.workerBrand} | HumanSourcer`
+  : `${role.title} at ${provider.workerBrand} (no longer listed) | HumanSourcer`;
+
+const task = taskType(role);
+const location = locationBucket({ location: role.location }, geographyScope(provider.geography));
+const pay = payBand(role);
+---
+
+<Layout title={title} description={description} canonicalPath={path} jsonLd={jsonLd} noindex={!role.is_active}>
+  <Breadcrumbs items={breadcrumbItems} />
+
+  {!role.is_active && (
+    <div class="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+      This role is no longer listed by {provider.workerBrand}. It last appeared active on{' '}
+      {new Date(role.last_seen_at).toISOString().slice(0, 10)}.
+    </div>
+  )}
+
+  <div class="text-sm uppercase tracking-wide text-slate-400">{provider.workerBrand}</div>
+  <h1 class="mt-1 text-3xl font-bold tracking-tight">{role.title}</h1>
+
+  <div class="mt-4 flex flex-wrap gap-2 text-xs">
+    <a href={`/roles/task/${task}/`} class="rounded-full bg-slate-100 px-3 py-1 text-slate-700 hover:bg-slate-200">
+      {TASK_TYPE_LABELS[task]}
+    </a>
+    <a href={`/roles/company/${provider.slug}/`} class="rounded-full bg-slate-100 px-3 py-1 text-slate-700 hover:bg-slate-200">
+      {provider.workerBrand}
+    </a>
+    {provider.domainTags.map((tag) => (
+      <a href={`/roles/domain/${tag}/`} class="rounded-full bg-slate-100 px-3 py-1 text-slate-700 hover:bg-slate-200">
+        {DOMAIN_TAG_LABELS[tag] ?? tag}
+      </a>
+    ))}
+    <span class="rounded-full bg-slate-100 px-3 py-1 text-slate-700">{LOCATION_BUCKET_LABELS[location]}</span>
+    {pay !== 'unspecified' && (
+      <span class="rounded-full bg-slate-100 px-3 py-1 text-slate-700">{PAY_BAND_LABELS[pay]}</span>
+    )}
+  </div>
+
+  <div class="mt-6 max-w-2xl text-slate-700">
+    <p>{description}</p>
+  </div>
+
+  {role.pay_text && (
+    <div class="mt-6">
+      <h2 class="text-sm uppercase tracking-wide text-slate-400">Pay</h2>
+      <p class="mt-1 text-slate-700">{role.pay_text}</p>
+    </div>
+  )}
+
+  {role.is_active ? (
+    <div class="mt-8">
+      <a
+        href={role.apply_url}
+        rel="nofollow sponsored"
+        class="inline-block rounded-md bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-700"
+      >
+        Apply at {provider.workerBrand} &rarr;
+      </a>
+    </div>
+  ) : (
+    <div class="mt-8">
+      <a href={providerUrl} class="inline-block rounded-md bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-700">
+        View {provider.workerBrand}&rsquo;s current open roles &rarr;
+      </a>
+    </div>
+  )}
+
+  {similarRoles.length > 0 && (
+    <div class="mt-10 border-t border-slate-200 pt-6">
+      <h2 class="text-sm uppercase tracking-wide text-slate-400">Similar open roles</h2>
+      <div class="mt-3 space-y-2">
+        {similarRoles.map((r) => (
+          <a href={rolePagePath(r)} class="block rounded-lg border border-slate-200 p-3 text-sm hover:border-slate-400">
+            <span class="font-medium">{r.title}</span>
+            <span class="text-slate-500"> &middot; {r.provider_slug}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  )}
+</Layout>

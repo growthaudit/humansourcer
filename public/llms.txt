@@ -16,5 +16,12 @@ networks. It is not affiliated with any listed provider.
 
 - /: full comparison directory of expert-tier AI-training networks, filterable
   by domain, access model, and geography.
+- /roles/: aggregate index of individually-indexed open roles scraped daily
+  across expert-tier networks, each with JobPosting structured data. Browsable
+  by domain (/roles/domain/{tag}/), company (/roles/company/{provider-slug}/),
+  and task type (/roles/task/{type}/), and filterable by pay and location.
+  Roles no longer listed by their source are kept live for a 14-day grace
+  window (marked noindex) before removal, rather than dropping straight to a
+  broken link.
 
-Provider profile pages are listed in /sitemap-index.xml.
+Provider profile pages and role pages are listed in /sitemap-index.xml.

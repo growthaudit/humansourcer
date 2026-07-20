@@ -1,0 +1,26 @@
+---
+// Renders the visible breadcrumb trail only. JSON-LD stays centralized in
+// src/lib/jsonld.ts — each page builds its own breadcrumbListJsonLd(items)
+// array from the same `items` list and appends it to the array it already
+// passes to Layout's `jsonLd` prop, so the two never disagree.
+interface Props {
+  items: { name: string; url: string }[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav aria-label="Breadcrumb" class="mb-4 text-sm text-slate-500">
+  <ol class="flex flex-wrap items-center gap-1">
+    {items.map((item, i) => (
+      <li class="flex items-center gap-1">
+        {i > 0 && <span aria-hidden="true">/</span>}
+        {i === items.length - 1 ? (
+          <span class="text-slate-700">{item.name}</span>
+        ) : (
+          <a href={item.url} class="hover:text-slate-800">{item.name}</a>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>

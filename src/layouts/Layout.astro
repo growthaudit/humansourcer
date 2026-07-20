@@ -6,9 +6,13 @@ interface Props {
   description: string;
   canonicalPath: string; // e.g. "/" or "/providers/alignerr"
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  // Grace-window ("no longer listed") role pages and non-canonical
+  // filter-combination views use this — real content, just not something
+  // that should claim a place in search results.
+  noindex?: boolean;
 }
 
-const { title, description, canonicalPath, jsonLd } = Astro.props;
+const { title, description, canonicalPath, jsonLd, noindex = false } = Astro.props;
 const canonicalUrl = new URL(canonicalPath, Astro.site);
 const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 ---
@@ -20,6 +24,7 @@ const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href={canonicalUrl} />
+    {noindex && <meta name="robots" content="noindex,follow" />}
     <title>{title}</title>
     <meta name="description" content={description} />
 
@@ -39,8 +44,23 @@ const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <header class="border-b border-slate-200">
       <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
         <a href="/" class="text-lg font-semibold tracking-tight">HumanSourcer</a>
-        <nav class="text-sm text-slate-600">
-          <a href="/" class="hover:text-slate-900">Expert networks</a>
+        <nav class="flex gap-4 text-sm text-slate-600">
+          <a
+            href="/"
+            class={Astro.url.pathname === '/' || Astro.url.pathname.startsWith('/providers')
+              ? 'font-semibold text-slate-900'
+              : 'hover:text-slate-900'}
+          >
+            Providers
+          </a>
+          <a
+            href="/roles/"
+            class={Astro.url.pathname.startsWith('/roles')
+              ? 'font-semibold text-slate-900'
+              : 'hover:text-slate-900'}
+          >
+            Roles
+          </a>
         </nav>
       </div>
     </header>

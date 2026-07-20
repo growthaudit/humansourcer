@@ -11,8 +11,9 @@ import {
   STATUS_LABELS,
   DOMAIN_TAG_LABELS,
 } from '../../lib/taxonomy';
-import { organizationJsonLd } from '../../lib/jsonld';
-import { getActiveRolesByProvider, type ProviderRoles } from '../../lib/roles';
+import { organizationJsonLd, breadcrumbListJsonLd } from '../../lib/jsonld';
+import { getActiveRolesByProvider, rolePagePath, type ProviderRoles } from '../../lib/roles';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
 
 export async function getStaticPaths() {
   const all = await getCollection('providers');
@@ -37,7 +38,12 @@ const { roles, totalCount } = providerRoles;
 const p = provider.data;
 
 const profileUrl = new URL(`/providers/${p.slug}`, Astro.site).toString();
-const jsonLd = organizationJsonLd(p, profileUrl);
+const breadcrumbItems = [
+  { name: 'Home', url: new URL('/', Astro.site).toString() },
+  { name: 'Providers', url: new URL('/', Astro.site).toString() },
+  { name: p.workerBrand, url: profileUrl },
+];
+const jsonLd = [organizationJsonLd(p, profileUrl), breadcrumbListJsonLd(breadcrumbItems)];
 
 const title = `${p.workerBrand} — ${p.parentGroup} | HumanSourcer`;
 const description = `${p.workerBrand} is ${p.parentGroup}'s ${p.portalType.toLowerCase()}. ${p.typicalWork}`;
@@ -49,6 +55,7 @@ const confidence = confidenceLevel(p.ownershipConfidence);
 ---
 
 <Layout title={title} description={description} canonicalPath={`/providers/${p.slug}`} jsonLd={jsonLd}>
+  <Breadcrumbs items={breadcrumbItems} />
   <a href="/" class="text-sm text-slate-500 hover:text-slate-800">&larr; All expert networks</a>
 
   <div class="mt-4 flex items-start justify-between gap-4">
@@ -134,8 +141,7 @@ const confidence = confidenceLevel(p.ownershipConfidence);
       <div class="mt-3 space-y-3">
         {roles.map((role) => (
           <a
-            href={role.apply_url}
-            rel="nofollow sponsored"
+            href={rolePagePath(role)}
             class="block rounded-lg border border-slate-200 p-4 transition hover:border-slate-400 hover:shadow-sm"
           >
             <div class="flex items-start justify-between gap-4">
