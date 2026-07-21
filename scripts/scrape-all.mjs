@@ -28,6 +28,11 @@ const scrapers = [
   'scrape-imerit.mjs',
   'scrape-micro1.mjs',
   'scrape-handshake.mjs',
+  'scrape-telus-ai-community.mjs',
+  'scrape-oneforma.mjs',
+  'scrape-dataforce-community.mjs',
+  'scrape-dataforce-jobs.mjs',
+  'scrape-welo-data.mjs',
 ];
 
 let failures = 0;

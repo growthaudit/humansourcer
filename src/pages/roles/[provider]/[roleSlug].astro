@@ -2,8 +2,9 @@
 import Layout from '../../../layouts/Layout.astro';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import FAQ from '../../../components/FAQ.astro';
-import { getCollection, type CollectionEntry } from 'astro:content';
-import { getAllRolesForPages, rolePagePath, roleSlug, type FullRole } from '../../../lib/roles';
+import type { CollectionEntry } from 'astro:content';
+import { rolePagePath, roleSlug, type FullRole } from '../../../lib/roles';
+import { getEligibleActiveRoles } from '../../../lib/role-rows';
 import { breadcrumbListJsonLd, jobPostingJsonLd, faqPageJsonLd } from '../../../lib/jsonld';
 import { composeRoleDescription } from '../../../lib/role-description';
 import { roleFAQs } from '../../../lib/role-faq';
@@ -21,25 +22,20 @@ import { providerHref } from '../../../lib/provider-url';
 type Provider = CollectionEntry<'providers'>['data'];
 
 export async function getStaticPaths() {
-  const allRoles = await getAllRolesForPages();
-  const providers = await getCollection('providers');
-  const expertProviders = new Map(
-    providers.filter((p) => p.data.audienceTiers.includes('expert')).map((p) => [p.data.slug, p.data])
-  );
-  const eligibleRoles = allRoles.filter((r) => expertProviders.has(r.provider_slug));
+  const eligible = await getEligibleActiveRoles();
 
-  return eligibleRoles.map((role) => {
-    const provider = expertProviders.get(role.provider_slug) as Provider;
+  return eligible.map(({ role, provider }) => {
     const similarRoles = role.is_active
       ? []
-      : eligibleRoles
+      : eligible
           .filter(
             (r) =>
-              r.is_active &&
-              r.id !== role.id &&
-              (r.provider_slug === role.provider_slug || taskType(r) === taskType(role))
+              r.role.is_active &&
+              r.role.id !== role.id &&
+              (r.role.provider_slug === role.provider_slug || taskType(r.role) === taskType(role))
           )
-          .slice(0, 5);
+          .slice(0, 5)
+          .map((r) => r.role);
 
     return {
       params: {

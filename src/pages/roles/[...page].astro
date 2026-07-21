@@ -37,16 +37,16 @@ const jsonLd = [
 
 const title =
   page.currentPage === 1
-    ? 'Open roles across AI-training expert networks | HumanSourcer'
-    : `Open roles across AI-training expert networks (page ${page.currentPage}) | HumanSourcer`;
-const description = `Browse ${page.total} open roles across HumanSourcer's expert AI-training networks, filterable by domain, task type, pay, location, and company.`;
+    ? 'Open roles across AI-training networks | HumanSourcer'
+    : `Open roles across AI-training networks (page ${page.currentPage}) | HumanSourcer`;
+const description = `Browse ${page.total} open roles across HumanSourcer's AI-training networks, filterable by domain, task type, pay, location, and company.`;
 ---
 
 <Layout title={title} description={description} canonicalPath={canonicalPath} jsonLd={jsonLd}>
   <Breadcrumbs items={breadcrumbItems} />
   <h1 class="text-3xl font-bold tracking-tight">Open roles</h1>
   <p class="mt-2 max-w-2xl text-ink-secondary">
-    {page.total} open roles scraped daily across HumanSourcer's expert-tier AI-training networks.
+    {page.total} open roles scraped daily across HumanSourcer's AI-training networks.
   </p>
 
   <div class="mt-8">

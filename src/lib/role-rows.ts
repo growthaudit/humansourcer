@@ -13,19 +13,22 @@ export interface RoleWithProvider {
   provider: Provider;
 }
 
-// Active roles from expert-tier providers only (gig-tier is out of scope
-// for this pass — see the humansourcer project plan). Shared by every
-// /roles/* route so "what counts as an eligible role" can't drift between
-// the base index, the hub pages, and the individual role pages.
+// Active roles from expert- and gig-tier providers (restricted-tier
+// providers have no public self-serve worker portal, so nothing is ever
+// scraped for them). Shared by every /roles/* route so "what counts as an
+// eligible role" can't drift between the base index, the hub pages, and the
+// individual role pages.
 export async function getEligibleActiveRoles(): Promise<RoleWithProvider[]> {
   const [allRoles, providers] = await Promise.all([getAllRolesForPages(), getCollection('providers')]);
-  const expertProviders = new Map(
-    providers.filter((p) => p.data.audienceTiers.includes('expert')).map((p) => [p.data.slug, p.data])
+  const eligibleProviders = new Map(
+    providers
+      .filter((p) => p.data.audienceTiers.includes('expert') || p.data.audienceTiers.includes('gig'))
+      .map((p) => [p.data.slug, p.data])
   );
   const result: RoleWithProvider[] = [];
   for (const role of allRoles) {
     if (!role.is_active) continue;
-    const provider = expertProviders.get(role.provider_slug);
+    const provider = eligibleProviders.get(role.provider_slug);
     if (provider) result.push({ role, provider });
   }
   return result;

@@ -7,6 +7,7 @@ import FAQ from '../../../../components/FAQ.astro';
 import { getEligibleActiveRoles, groupByCompany, toRoleRow, type RoleWithProvider } from '../../../../lib/role-rows';
 import { itemListJsonLd, breadcrumbListJsonLd, faqPageJsonLd } from '../../../../lib/jsonld';
 import { computeHubStats, companyHubFAQs, type HubStats } from '../../../../lib/role-faq';
+import { providerHref } from '../../../../lib/provider-url';
 
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
   const PAGE_SIZE = 24;
@@ -31,7 +32,7 @@ const faqs = provider ? companyHubFAQs(provider, stats) : [];
 
 const canonicalPath = page.currentPage === 1 ? `/roles/company/${slug}/` : `/roles/company/${slug}/${page.currentPage}/`;
 const pageUrl = new URL(canonicalPath, Astro.site).toString();
-const providerUrl = new URL(`/providers/${slug}`, Astro.site).toString();
+const providerUrl = provider ? new URL(providerHref(provider), Astro.site).toString() : undefined;
 
 const breadcrumbItems = [
   { name: 'Home', url: new URL('/', Astro.site).toString() },
@@ -50,7 +51,7 @@ const title = provider
   : `${workerBrand} open roles | HumanSourcer`;
 const description = provider
   ? `Is ${workerBrand} legit? ${provider.relationship}. ${stats.totalRoles} open roles listed now — see pay, location, and ownership evidence.`
-  : `${stats.totalRoles} open roles at ${workerBrand}, part of HumanSourcer's expert AI-training network directory.`;
+  : `${stats.totalRoles} open roles at ${workerBrand}, part of HumanSourcer's AI-training network directory.`;
 ---
 
 <Layout title={title} description={description} canonicalPath={canonicalPath} jsonLd={jsonLd}>

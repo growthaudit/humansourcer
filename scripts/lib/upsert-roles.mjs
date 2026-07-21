@@ -38,6 +38,9 @@ export function stripHtml(html) {
   return (html ?? '')
     .replace(/<[^>]+>/g, ' ')
     .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&#0?39;/g, "'")
+    .replace(/&quot;/g, '"')
     .replace(/\s+/g, ' ')
     .trim();
 }

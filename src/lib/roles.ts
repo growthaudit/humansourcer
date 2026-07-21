@@ -51,7 +51,7 @@ export interface ProviderRoles {
 // accumulate stale listings.
 const GRACE_WINDOW_DAYS = 14;
 
-function getSupabaseCredentials(): { url: string; key: string } | null {
+export function getSupabaseCredentials(): { url: string; key: string } | null {
   // Checked in two places: import.meta.env (Vite's injection, populated
   // when this module is loaded through an actual Astro page/SSR context)
   // and process.env (populated directly by Vercel's Supabase integration at

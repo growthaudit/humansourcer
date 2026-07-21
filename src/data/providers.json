@@ -84,9 +84,9 @@
     "accessModel": "Open application",
     "geography": "Country and project dependent",
     "ownershipConfidence": "Confirmed",
-    "relationshipEvidenceUrl": "https://scale.com/legal/contributor-privacy-policy",
+    "relationshipEvidenceUrl": "https://outlier.ai/about-us",
     "statusEvidenceUrl": "https://outlier.ai/",
-    "lastChecked": "2026-07-18",
+    "lastChecked": "2026-07-20",
     "notes": "Scale contributor privacy materials cover Outlier."
   },
   {
@@ -106,9 +106,9 @@
     "accessModel": "Open application",
     "geography": "Country dependent",
     "ownershipConfidence": "Confirmed",
-    "relationshipEvidenceUrl": "https://scale.com/legal/contributor-privacy-policy",
+    "relationshipEvidenceUrl": "https://www.remotasks.com/en",
     "statusEvidenceUrl": "https://www.remotasks.com/en",
-    "lastChecked": "2026-07-18",
+    "lastChecked": "2026-07-20",
     "notes": "Separate worker brand from Outlier."
   },
   {
@@ -178,9 +178,9 @@
     "accessModel": "Open roles / applications",
     "geography": "Global, role dependent",
     "ownershipConfidence": "Confirmed",
-    "relationshipEvidenceUrl": "https://toloka.ai/annotators",
+    "relationshipEvidenceUrl": "https://mindrift.ai/welcome",
     "statusEvidenceUrl": "https://mindrift.ai/apply",
-    "lastChecked": "2026-07-18",
+    "lastChecked": "2026-07-20",
     "notes": "Toloka says annotator projects moved to Mindrift.",
     "aliases": [
       {
@@ -338,9 +338,9 @@
     "accessModel": "Registration / project application",
     "geography": "Global, project dependent",
     "ownershipConfidence": "Confirmed",
-    "relationshipEvidenceUrl": "https://www.centific.com/oneforma",
+    "relationshipEvidenceUrl": "https://www.centific.com/products/oneforma",
     "statusEvidenceUrl": "https://www.oneforma.com/jobs/",
-    "lastChecked": "2026-07-18",
+    "lastChecked": "2026-07-20",
     "notes": "Pactera EDGE was rebranded as Centific.",
     "aliases": [
       {
@@ -458,9 +458,9 @@
     "accessModel": "Open registration",
     "geography": "Global, task dependent",
     "ownershipConfidence": "Confirmed",
-    "relationshipEvidenceUrl": "https://www.neevo.ai/terms",
+    "relationshipEvidenceUrl": "https://www.neevo.ai/legal/",
     "statusEvidenceUrl": "https://www.neevo.ai/",
-    "lastChecked": "2026-07-18",
+    "lastChecked": "2026-07-20",
     "notes": "Neevo legal materials identify Defined.ai."
   },
   {
@@ -590,14 +590,14 @@
       "generalist"
     ],
     "typicalWork": "Generalist and specialist AI evaluation and training projects",
-    "workerUrl": "https://joinhandshake.com/ai/opportunities",
+    "workerUrl": "https://joinhandshake.com/ai/opportunities/",
     "status": "Active",
     "accessModel": "Apply to listed opportunities",
     "geography": "Many roles require US work authorisation",
     "ownershipConfidence": "Confirmed",
-    "relationshipEvidenceUrl": "https://joinhandshake.com/ai",
-    "statusEvidenceUrl": "https://joinhandshake.com/ai/opportunities",
-    "lastChecked": "2026-07-18",
+    "relationshipEvidenceUrl": "https://joinhandshake.com/ai/",
+    "statusEvidenceUrl": "https://joinhandshake.com/ai/opportunities/",
+    "lastChecked": "2026-07-20",
     "notes": "Keep geography at role level."
   },
   {
@@ -778,9 +778,9 @@
     "accessModel": "Apply to current listing",
     "geography": "Role dependent",
     "ownershipConfidence": "Confirmed",
-    "relationshipEvidenceUrl": "https://www.humansignal.com/",
+    "relationshipEvidenceUrl": "https://humansignal.com/",
     "statusEvidenceUrl": "https://job-boards.greenhouse.io/humansignal/jobs/5823725004",
-    "lastChecked": "2026-07-18",
+    "lastChecked": "2026-07-20",
     "notes": "May disappear when the hiring campaign closes; monitor."
   },
   {
@@ -823,9 +823,9 @@
     "accessModel": "Apply to listed roles",
     "geography": "Global, role dependent",
     "ownershipConfidence": "Confirmed",
-    "relationshipEvidenceUrl": "https://sepalai.com/",
+    "relationshipEvidenceUrl": "https://expert-hub.sepalai.com/jobs",
     "statusEvidenceUrl": "https://expert-hub.sepalai.com/jobs",
-    "lastChecked": "2026-07-18",
+    "lastChecked": "2026-07-20",
     "notes": "Emerging expert network."
   },
   {
@@ -1020,14 +1020,14 @@
       "generalist"
     ],
     "typicalWork": "Data collection and annotation tasks",
-    "workerUrl": "https://taskverse.com/",
+    "workerUrl": "https://taskverse.com/signup",
     "status": "Active",
     "accessModel": "Open registration / tasks",
     "geography": "Global, task dependent",
     "ownershipConfidence": "Confirmed",
-    "relationshipEvidenceUrl": "https://www.taskus.com/about-us/newsroom/taskus-launches-taskverse/",
-    "statusEvidenceUrl": "https://taskverse.com/",
-    "lastChecked": "2026-07-18",
+    "relationshipEvidenceUrl": "https://www.taskus.com/locations/taskverse/",
+    "statusEvidenceUrl": "https://taskverse.com/signup",
+    "lastChecked": "2026-07-20",
     "notes": "Worker brand operated separately from TaskUs corporate hiring."
   },
   {
