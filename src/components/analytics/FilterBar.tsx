@@ -1,16 +1,12 @@
 import { useMemo } from 'preact/hooks';
 import type { ListingAnalyticsRow } from '../../lib/listings-analytics';
 import { TASK_TYPE_LABELS, type TaskType } from '../../lib/role-taxonomy';
-import type { Filters } from './filters';
+import { toggleValue, type Filters } from './filters';
 
 interface Props {
   optionsPool: ListingAnalyticsRow[];
   filters: Filters;
   onChange: (next: Filters) => void;
-}
-
-function toggleValue<T>(list: T[], value: T): T[] {
-  return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
 }
 
 function MultiSelect<T extends string>({

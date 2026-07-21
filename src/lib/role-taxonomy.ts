@@ -125,10 +125,21 @@ export function hourlyRate(role: PayInput): number | null {
   return role.pay_max ?? role.pay_min;
 }
 
+// A free-text figure only gets treated as an hourly rate when the text says
+// so explicitly. Without this, a range like "$80,000 - $110,000/yr" (a real
+// value in the data, from afterquery-experts) would silently get parsed as
+// $80/hr: the digit match stops at the thousands comma, and nothing was
+// checking the unit at all. Confirmed live: this exact string exists.
+function isHourlyPayText(text: string): boolean {
+  return /\bhour(ly)?\b|\/\s*hr\b/i.test(text);
+}
+
 // Pulls a dollar figure out of free-text pay strings like "$18-25/hr" —
 // prefers the upper ("up to") bound when a range is given, same as
-// hourlyRate() above. Returns null for text with no parseable $ figure.
+// hourlyRate() above. Returns null for text with no explicit hourly signal
+// or no parseable $ figure (see isHourlyPayText above).
 function parseTextRate(payText: string): number | null {
+  if (!isHourlyPayText(payText)) return null;
   const match = payText.match(/\$(\d+(?:\.\d+)?)(?:-(\d+(?:\.\d+)?))?/);
   if (!match) return null;
   return match[2] ? Number(match[2]) : Number(match[1]);

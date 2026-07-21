@@ -1,8 +1,11 @@
 import { useMemo } from 'preact/hooks';
 import type { ListingAnalyticsRow } from '../../lib/listings-analytics';
+import { useChartTooltip, ChartTooltip } from './ChartTooltip';
 
 interface Props {
   rows: ListingAnalyticsRow[];
+  selectedProviders: string[];
+  onToggleProvider: (slug: string) => void;
 }
 
 const W = 760;
@@ -29,7 +32,9 @@ interface ProviderPoint {
 // (never do that) or make most bubbles indistinguishable gray. A single
 // accent hue plus position/size/direct-label/tooltip carries the identity
 // instead, same convention a plain scatter plot uses.
-export default function ProviderBubbleChart({ rows }: Props) {
+export default function ProviderBubbleChart({ rows, selectedProviders, onToggleProvider }: Props) {
+  const { containerRef, tooltip, showTooltip, hideTooltip } = useChartTooltip();
+
   const points = useMemo<ProviderPoint[]>(() => {
     const map = new Map<string, { brand: string; count: number; ratedSum: number; ratedCount: number }>();
     for (const r of rows) {
@@ -72,11 +77,12 @@ export default function ProviderBubbleChart({ rows }: Props) {
   );
 
   return (
-    <div class="rounded-lg border border-border bg-surface p-4">
+    <div ref={containerRef} class="relative rounded-lg border border-border bg-surface p-4">
+      <ChartTooltip tooltip={tooltip} />
       <h3 class="text-sm font-medium text-ink-primary">Provider landscape</h3>
       <p class="mt-1 text-xs text-ink-secondary">
         Bubble size = open listings. Y = avg. published rate. X = pay transparency (share of that provider's own
-        listings with a published rate).
+        listings with a published rate). Click a bubble to filter by that provider.
       </p>
       <div class="mt-3 h-80">
         {points.length === 0 ? (
@@ -114,17 +120,24 @@ export default function ProviderBubbleChart({ rows }: Props) {
             ))}
 
             {points.map((p) => (
-              <g>
+              <g opacity={selectedProviders.length > 0 && !selectedProviders.includes(p.slug) ? 0.35 : 1}>
                 <circle
                   cx={x(p.transparency)}
                   cy={y(p.avgPay)}
                   r={r(p.count)}
-                  fill="var(--color-accent-soft-strong)"
+                  fill={selectedProviders.includes(p.slug) ? 'var(--color-accent)' : 'var(--color-accent-soft-strong)'}
                   stroke="var(--color-accent)"
                   stroke-width="1.5"
-                >
-                  <title>{`${p.brand}: ${p.count} open listings, avg ${currencyFmt.format(p.avgPay)}/hr, ${pctFmt.format(p.transparency)} with a published rate`}</title>
-                </circle>
+                  class="cursor-pointer"
+                  onMouseEnter={(e) =>
+                    showTooltip(
+                      e as unknown as MouseEvent,
+                      `${p.brand}: ${p.count} open listings, avg ${currencyFmt.format(p.avgPay)}/hr, ${pctFmt.format(p.transparency)} with a published rate`
+                    )
+                  }
+                  onMouseLeave={hideTooltip}
+                  onClick={() => onToggleProvider(p.slug)}
+                />
                 {labeled.has(p.slug) && (
                   <text
                     x={x(p.transparency)}

@@ -1,19 +1,25 @@
 import { useMemo } from 'preact/hooks';
 import type { ListingAnalyticsRow } from '../../lib/listings-analytics';
 import { seriesColor, OTHER_COLOR } from './palette';
+import { useChartTooltip, ChartTooltip } from './ChartTooltip';
 
 interface Props {
   rows: ListingAnalyticsRow[];
+  selectedProviders: string[];
+  onToggleProvider: (slug: string) => void;
 }
 
 const TOP_USE_CASES = 6;
 const TOP_PROVIDERS = 8;
+const OTHER_SLUG = '__other__';
 
 const W = 760;
 const H = 300;
 const PAD = { top: 10, right: 10, bottom: 46, left: 36 };
 
-export default function MarketProviderChart({ rows }: Props) {
+export default function MarketProviderChart({ rows, selectedProviders, onToggleProvider }: Props) {
+  const { containerRef, tooltip, showTooltip, hideTooltip } = useChartTooltip();
+
   const { useCases, providers, matrix, maxTotal } = useMemo(() => {
     const useCaseTotals = new Map<string, number>();
     const providerTotals = new Map<string, string>(); // slug -> brand
@@ -33,12 +39,12 @@ export default function MarketProviderChart({ rows }: Props) {
       .map(([slug]) => slug);
     const hasOtherProvider = rows.some((r) => !topProviderSlugs.includes(r.providerSlug));
     const providerList = topProviderSlugs.map((slug) => ({ slug, label: providerTotals.get(slug) ?? slug }));
-    if (hasOtherProvider) providerList.push({ slug: '__other__', label: 'Other providers' });
+    if (hasOtherProvider) providerList.push({ slug: OTHER_SLUG, label: 'Other providers' });
 
     const grid = new Map<string, Map<string, number>>();
     for (const r of rows) {
       const ucLabel = topUseCases.includes(r.taskTypeLabel) ? r.taskTypeLabel : 'Other use cases';
-      const pSlug = topProviderSlugs.includes(r.providerSlug) ? r.providerSlug : '__other__';
+      const pSlug = topProviderSlugs.includes(r.providerSlug) ? r.providerSlug : OTHER_SLUG;
       if (!grid.has(ucLabel)) grid.set(ucLabel, new Map());
       const m = grid.get(ucLabel)!;
       m.set(pSlug, (m.get(pSlug) ?? 0) + 1);
@@ -56,11 +62,16 @@ export default function MarketProviderChart({ rows }: Props) {
   const barWidth = useCases.length > 0 ? (plotW - barGap * (useCases.length - 1)) / useCases.length : plotW;
 
   const yFromCount = (v: number) => (v / maxTotal) * plotH;
+  const isDimmed = (slug: string) => selectedProviders.length > 0 && slug !== OTHER_SLUG && !selectedProviders.includes(slug);
 
   return (
-    <div class="rounded-lg border border-border bg-surface p-4">
+    <div ref={containerRef} class="relative rounded-lg border border-border bg-surface p-4">
+      <ChartTooltip tooltip={tooltip} />
       <h3 class="text-sm font-medium text-ink-primary">Market demand vs. provider concentration</h3>
-      <p class="mt-1 text-xs text-ink-secondary">Bar height = total listings for that use case. Segment size = one provider's share.</p>
+      <p class="mt-1 text-xs text-ink-secondary">
+        Bar height = total listings for that use case. Segment size = one provider's share. Click a segment or legend
+        entry to filter by that provider.
+      </p>
       <div class="mt-3 h-72">
         {useCases.length === 0 ? (
           <div class="flex h-full items-center justify-center text-sm text-ink-secondary">
@@ -88,10 +99,13 @@ export default function MarketProviderChart({ rows }: Props) {
                           y={s.y}
                           width={barWidth}
                           height={Math.max(0, s.h - 1)}
-                          fill={s.slug === '__other__' ? OTHER_COLOR : seriesColor(si)}
-                        >
-                          <title>{`${uc} — ${s.label}: ${s.count}`}</title>
-                        </rect>
+                          fill={s.slug === OTHER_SLUG ? OTHER_COLOR : seriesColor(si)}
+                          opacity={isDimmed(s.slug) ? 0.35 : 1}
+                          class={s.slug === OTHER_SLUG ? '' : 'cursor-pointer'}
+                          onMouseEnter={(e) => showTooltip(e as unknown as MouseEvent, `${uc} — ${s.label}: ${s.count}`)}
+                          onMouseLeave={hideTooltip}
+                          onClick={() => s.slug !== OTHER_SLUG && onToggleProvider(s.slug)}
+                        />
                       )
                   )}
                   <text
@@ -110,15 +124,19 @@ export default function MarketProviderChart({ rows }: Props) {
         )}
       </div>
       {providers.length > 0 && (
-        <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-secondary">
+        <div class="mt-3 flex flex-wrap gap-x-2 gap-y-1 text-xs">
           {providers.map((p, pi) => (
-            <span class="flex items-center gap-1.5">
-              <span
-                class="h-2 w-2 rounded-full"
-                style={{ backgroundColor: p.slug === '__other__' ? OTHER_COLOR : seriesColor(pi) }}
-              />
+            <button
+              type="button"
+              disabled={p.slug === OTHER_SLUG}
+              onClick={() => onToggleProvider(p.slug)}
+              class={`flex items-center gap-1.5 rounded px-1.5 py-0.5 transition-colors duration-200 ease-out ${
+                p.slug === OTHER_SLUG ? 'text-ink-tertiary' : 'cursor-pointer text-ink-secondary hover:bg-surface-raised'
+              } ${selectedProviders.includes(p.slug) ? 'bg-accent-soft text-ink-primary' : ''}`}
+            >
+              <span class="h-2 w-2 rounded-full" style={{ backgroundColor: p.slug === OTHER_SLUG ? OTHER_COLOR : seriesColor(pi) }} />
               {p.label}
-            </span>
+            </button>
           ))}
         </div>
       )}

@@ -1,40 +1,54 @@
 import { useMemo, useState } from 'preact/hooks';
 import type { ListingAnalyticsRow } from '../../lib/listings-analytics';
+import type { TaskType } from '../../lib/role-taxonomy';
 
 interface Props {
   rows: ListingAnalyticsRow[];
+  selectedCategories: string[];
+  selectedTaskTypes: TaskType[];
+  onToggleCategory: (c: string) => void;
+  onToggleTaskType: (t: TaskType) => void;
 }
 
 type GroupBy = 'category' | 'useCase';
 const MAX_GROUPS = 8;
 const currencyFmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 
+// Group key is the category string or the TaskType enum value (not its
+// label) — the raw key is what gets passed back through onToggle*, so it
+// has to match exactly what FilterBar/filters.ts compares against.
 function groupKey(row: ListingAnalyticsRow, groupBy: GroupBy): string | null {
-  return groupBy === 'category' ? row.category : row.taskTypeLabel;
+  return groupBy === 'category' ? row.category : row.taskType;
 }
 
-export default function ValuationChart({ rows }: Props) {
+function groupLabel(row: ListingAnalyticsRow, groupBy: GroupBy): string {
+  return groupBy === 'category' ? (row.category ?? '') : row.taskTypeLabel;
+}
+
+export default function ValuationChart({ rows, selectedCategories, selectedTaskTypes, onToggleCategory, onToggleTaskType }: Props) {
   const [groupBy, setGroupBy] = useState<GroupBy>('useCase');
 
   const { groups, ratedCount } = useMemo(() => {
     const rated = rows.filter((r) => r.hourlyRate != null);
-    const sums = new Map<string, { total: number; count: number }>();
+    const sums = new Map<string, { label: string; total: number; count: number }>();
     for (const r of rated) {
       const key = groupKey(r, groupBy);
       if (!key) continue;
-      const entry = sums.get(key) ?? { total: 0, count: 0 };
+      const entry = sums.get(key) ?? { label: groupLabel(r, groupBy), total: 0, count: 0 };
       entry.total += r.hourlyRate ?? 0;
       entry.count += 1;
       sums.set(key, entry);
     }
     const list = [...sums.entries()]
-      .map(([label, { total, count }]) => ({ label, avg: total / count, count }))
+      .map(([key, { label, total, count }]) => ({ key, label, avg: total / count, count }))
       .sort((a, b) => b.avg - a.avg)
       .slice(0, MAX_GROUPS);
     return { groups: list, ratedCount: rated.length };
   }, [rows, groupBy]);
 
   const maxAvg = Math.max(1, ...groups.map((g) => g.avg));
+  const isSelected = (key: string) => (groupBy === 'category' ? selectedCategories.includes(key) : selectedTaskTypes.includes(key as TaskType));
+  const toggle = (key: string) => (groupBy === 'category' ? onToggleCategory(key) : onToggleTaskType(key as TaskType));
 
   return (
     <div class="rounded-lg border border-border bg-surface p-4">
@@ -64,28 +78,35 @@ export default function ValuationChart({ rows }: Props) {
           </div>
         ) : (
           <div class="space-y-2.5">
-            {groups.map((g) => (
-              <div>
-                <div class="mb-1 flex items-baseline justify-between text-xs text-ink-secondary">
-                  <span class="truncate pr-2">{g.label}</span>
-                  <span class="whitespace-nowrap text-ink-primary">
-                    {currencyFmt.format(g.avg)}/hr <span class="text-ink-tertiary">({g.count})</span>
-                  </span>
-                </div>
-                <div class="h-2 w-full rounded-full bg-border">
-                  <div
-                    class="h-2 rounded-full"
-                    style={{ width: `${(g.avg / maxAvg) * 100}%`, backgroundColor: 'var(--color-accent)' }}
-                  />
-                </div>
-              </div>
-            ))}
+            {groups.map((g) => {
+              const active = isSelected(g.key);
+              return (
+                <button
+                  type="button"
+                  onClick={() => toggle(g.key)}
+                  class={`block w-full rounded px-1.5 py-1 text-left transition-colors duration-200 ease-out hover:bg-surface-raised ${active ? 'bg-accent-soft' : ''}`}
+                >
+                  <div class="mb-1 flex items-baseline justify-between text-xs text-ink-secondary">
+                    <span class="truncate pr-2">{g.label}</span>
+                    <span class="whitespace-nowrap text-ink-primary">
+                      {currencyFmt.format(g.avg)}/hr <span class="text-ink-tertiary">({g.count})</span>
+                    </span>
+                  </div>
+                  <div class="h-2 w-full rounded-full bg-border">
+                    <div
+                      class="h-2 rounded-full"
+                      style={{ width: `${(g.avg / maxAvg) * 100}%`, backgroundColor: 'var(--color-accent)' }}
+                    />
+                  </div>
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
       <p class="mt-3 text-xs text-ink-tertiary">
         Based on {ratedCount} of {rows.length} listings with a published hourly rate — most sources only publish
-        free-text pay, so this reflects a small subset, not the full market.
+        free-text pay, so this reflects a small subset, not the full market. Click a row to filter by it.
       </p>
     </div>
   );

@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import type { ListingAnalyticsRow } from '../lib/listings-analytics';
-import { EMPTY_FILTERS, decodeFiltersFromLocation, encodeFiltersToParams, matchesFilters, type Filters } from './analytics/filters';
+import type { TaskType } from '../lib/role-taxonomy';
+import { EMPTY_FILTERS, decodeFiltersFromLocation, encodeFiltersToParams, matchesFilters, toggleValue, type Filters } from './analytics/filters';
 import FilterBar from './analytics/FilterBar';
 import KpiCards from './analytics/KpiCards';
 import TrendChart from './analytics/TrendChart';
 import ValuationChart from './analytics/ValuationChart';
 import MarketProviderChart from './analytics/MarketProviderChart';
 import ProviderBubbleChart from './analytics/ProviderBubbleChart';
+import ProviderRadarChart from './analytics/ProviderRadarChart';
+import DemandHeatmap from './analytics/DemandHeatmap';
 import ListingsTable from './analytics/ListingsTable';
 
 // This page is fully client-rendered content (unlike /roles/*, there's no
@@ -44,6 +47,13 @@ export default function ListingsDashboard({ initialRows }: Props) {
 
   const filteredRows = useMemo(() => rows.filter((r) => matchesFilters(r, filters)), [rows, filters]);
 
+  // Shared cross-filter callbacks — every chart below that lets you click a
+  // data point to filter routes through these, so a click in any chart and
+  // a checkbox in FilterBar land in the exact same filters state.
+  const toggleProvider = (slug: string) => setFilters((f) => ({ ...f, providers: toggleValue(f.providers, slug) }));
+  const toggleTaskType = (t: TaskType) => setFilters((f) => ({ ...f, taskTypes: toggleValue(f.taskTypes, t) }));
+  const toggleCategory = (c: string) => setFilters((f) => ({ ...f, categories: toggleValue(f.categories, c) }));
+
   return (
     <div class="space-y-6">
       <FilterBar optionsPool={rows} filters={filters} onChange={setFilters} />
@@ -55,17 +65,22 @@ export default function ListingsDashboard({ initialRows }: Props) {
           ))}
         </div>
       ) : (
-        <KpiCards rows={filteredRows} />
+        <KpiCards rows={filteredRows} selectedTaskTypes={filters.taskTypes} onToggleTaskType={toggleTaskType} />
       )}
 
       <div class="grid gap-4 lg:grid-cols-2">
-        <TrendChart rows={filteredRows} />
-        <ValuationChart rows={filteredRows} />
+        <TrendChart rows={filteredRows} selectedTaskTypes={filters.taskTypes} onToggleTaskType={toggleTaskType} />
+        <ValuationChart rows={filteredRows} selectedCategories={filters.categories} selectedTaskTypes={filters.taskTypes} onToggleCategory={toggleCategory} onToggleTaskType={toggleTaskType} />
       </div>
 
-      <MarketProviderChart rows={filteredRows} />
+      <MarketProviderChart rows={filteredRows} selectedProviders={filters.providers} onToggleProvider={toggleProvider} />
 
-      <ProviderBubbleChart rows={filteredRows} />
+      <DemandHeatmap rows={filteredRows} selectedProviders={filters.providers} selectedTaskTypes={filters.taskTypes} onToggleProvider={toggleProvider} onToggleTaskType={toggleTaskType} />
+
+      <div class="grid gap-4 lg:grid-cols-2">
+        <ProviderBubbleChart rows={filteredRows} selectedProviders={filters.providers} onToggleProvider={toggleProvider} />
+        <ProviderRadarChart rows={filteredRows} />
+      </div>
 
       <ListingsTable rows={filteredRows} />
     </div>

@@ -14,6 +14,10 @@ export interface Filters {
   query: string;
 }
 
+export function toggleValue<T>(list: T[], value: T): T[] {
+  return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
+}
+
 export const EMPTY_FILTERS: Filters = {
   categories: [],
   taskTypes: [],
