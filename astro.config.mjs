@@ -51,6 +51,7 @@ export default defineConfig({
         const path = new URL(page).pathname;
         if (path.startsWith('/go/')) return false;
         if (path === '/roles-data.json') return false;
+        if (path === '/listings-analytics-data.json') return false;
         if (noindexRolePaths.has(path)) return false;
         return true;
       },

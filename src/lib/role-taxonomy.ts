@@ -113,15 +113,28 @@ function isHourlyUnit(unit: string | null): boolean {
   return /hour|^hr$/i.test(unit);
 }
 
+// Structured, real numeric hourly rate only — null for project/package-based
+// pay (no per-hour figure exists to average) and for unrecognized units
+// (real pay, but not confidently a rate). Never derived from pay_text: only
+// vetto/mercor populate pay_min/pay_max with genuine structured data, per
+// the schema comment on those columns.
+export function hourlyRate(role: PayInput): number | null {
+  if (role.pay_min == null) return null;
+  if (!isHourlyUnit(role.pay_unit)) return null;
+  return role.pay_max ?? role.pay_min;
+}
+
+function bandForRate(rate: number): PayBand {
+  if (rate < 20) return 'under-20';
+  if (rate <= 40) return '20-40';
+  return '40-plus';
+}
+
 export function payBand(role: PayInput): PayBand {
   if (role.pay_min != null) {
     if (isProjectBasedUnit(role.pay_unit)) return 'project-based';
-    if (isHourlyUnit(role.pay_unit)) {
-      const rate = role.pay_max ?? role.pay_min;
-      if (rate < 20) return 'under-20';
-      if (rate <= 40) return '20-40';
-      return '40-plus';
-    }
+    const rate = hourlyRate(role);
+    if (rate != null) return bandForRate(rate);
     // Structured pay with an unrecognized unit — still real pay, just can't
     // confidently bucket it by rate; don't guess a band.
     return 'unspecified';
@@ -132,9 +145,7 @@ export function payBand(role: PayInput): PayBand {
     const match = role.pay_text.match(/\$(\d+(?:\.\d+)?)(?:-(\d+(?:\.\d+)?))?/);
     if (match) {
       const rate = match[2] ? Number(match[2]) : Number(match[1]);
-      if (rate < 20) return 'under-20';
-      if (rate <= 40) return '20-40';
-      return '40-plus';
+      return bandForRate(rate);
     }
   }
 

@@ -85,6 +85,16 @@ const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
           >
             Roles
           </a>
+          <a
+            href="/market-data/"
+            class={`transition-colors duration-200 ease-out ${
+              Astro.url.pathname.startsWith('/market-data')
+                ? 'font-semibold text-ink-primary'
+                : 'hover:text-ink-primary'
+            }`}
+          >
+            Market data
+          </a>
         </nav>
       </div>
     </header>

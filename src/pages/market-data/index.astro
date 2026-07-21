@@ -1,0 +1,40 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import ListingsDashboard from '../../components/ListingsDashboard';
+import { getEligibleActiveRoles } from '../../lib/role-rows';
+import { toAnalyticsRow } from '../../lib/listings-analytics';
+import { breadcrumbListJsonLd } from '../../lib/jsonld';
+
+const eligible = await getEligibleActiveRoles();
+const rows = eligible.map(toAnalyticsRow);
+
+const providerCount = new Set(rows.map((r) => r.providerSlug)).size;
+
+const canonicalPath = '/market-data/';
+const pageUrl = new URL(canonicalPath, Astro.site).toString();
+
+const breadcrumbItems = [
+  { name: 'Home', url: new URL('/', Astro.site).toString() },
+  { name: 'Market data', url: pageUrl },
+];
+
+const jsonLd = [breadcrumbListJsonLd(breadcrumbItems)];
+
+const title = 'AI-training market data | HumanSourcer';
+const description = `Filterable market data across ${rows.length} active listings from ${providerCount} AI-training networks — demand trends by use case, published pay averages, and provider concentration.`;
+---
+
+<Layout title={title} description={description} canonicalPath={canonicalPath} jsonLd={jsonLd}>
+  <Breadcrumbs items={breadcrumbItems} />
+  <h1 class="text-3xl font-bold tracking-tight">Market data</h1>
+  <p class="mt-2 max-w-2xl text-ink-secondary">
+    {rows.length} active listings across {providerCount} AI-training networks, updated daily. Filter by category,
+    use case, provider, or date to see demand trends, published pay averages, and how listings concentrate across
+    providers.
+  </p>
+
+  <div class="mt-8">
+    <ListingsDashboard initialRows={rows} client:load />
+  </div>
+</Layout>
