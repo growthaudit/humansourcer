@@ -1,16 +1,49 @@
 ---
+// Single detail route for every provider regardless of tier — a provider
+// only ever gets one page (see src/lib/provider-url.ts), so this flat
+// namespace never collides. Framing (back-link, CTA copy, whether an "Open
+// roles" section makes sense) is chosen from the provider's primary
+// (first) audienceTier.
 import Layout from '../../layouts/Layout.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { organizationJsonLd, breadcrumbListJsonLd } from '../../lib/jsonld';
 import { getActiveRolesByProvider, type ProviderRoles } from '../../lib/roles';
+import { tierListingHref } from '../../lib/provider-url';
+import type { AudienceTier } from '../../components/ProviderFilter';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import ProviderDetail from '../../components/ProviderDetail.astro';
 
+const TIER_FRAMING: Record<
+  AudienceTier,
+  { breadcrumbName: string; backLabel: string; ctaLabel: (name: string) => string; ctaRel: string; showRoles: boolean }
+> = {
+  expert: {
+    breadcrumbName: 'Expert networks',
+    backLabel: 'All expert networks',
+    ctaLabel: (name) => `Visit ${name}`,
+    ctaRel: 'nofollow sponsored',
+    showRoles: true,
+  },
+  gig: {
+    breadcrumbName: 'Gig platforms',
+    backLabel: 'All gig platforms',
+    ctaLabel: (name) => `Visit ${name}`,
+    ctaRel: 'nofollow sponsored',
+    showRoles: false,
+  },
+  restricted: {
+    breadcrumbName: 'Managed & restricted-access',
+    backLabel: 'All managed & restricted-access companies',
+    ctaLabel: () => 'See official careers page',
+    ctaRel: 'nofollow',
+    showRoles: false,
+  },
+};
+
 export async function getStaticPaths() {
   const all = await getCollection('providers');
-  const experts = all.filter((p) => p.data.audienceTiers[0] === 'expert');
   const rolesByProvider = await getActiveRolesByProvider();
-  return experts.map((provider) => ({
+  return all.map((provider) => ({
     params: { slug: provider.data.slug },
     props: {
       provider,
@@ -26,17 +59,25 @@ interface Props {
 
 const { provider, providerRoles }: Props = Astro.props;
 const p = provider.data;
+const tier = p.audienceTiers[0];
+const framing = TIER_FRAMING[tier];
 
 const profileUrl = new URL(`/providers/${p.slug}`, Astro.site).toString();
 const breadcrumbItems = [
   { name: 'Home', url: new URL('/', Astro.site).toString() },
-  { name: 'Providers', url: new URL('/', Astro.site).toString() },
+  { name: framing.breadcrumbName, url: new URL(tierListingHref(tier), Astro.site).toString() },
   { name: p.workerBrand, url: profileUrl },
 ];
 const jsonLd = [organizationJsonLd(p, profileUrl), breadcrumbListJsonLd(breadcrumbItems)];
 
-const title = `Is ${p.workerBrand} Legit? Pay & Ownership Review | HumanSourcer`;
-const description = `Is ${p.workerBrand} legit? ${p.relationship} (ownership confidence: ${p.ownershipConfidence.toLowerCase()}). ${p.typicalWork}.`;
+const title =
+  tier === 'restricted'
+    ? `${p.workerBrand}: Ownership & Worker Access | HumanSourcer`
+    : `Is ${p.workerBrand} Legit? Pay & Ownership Review | HumanSourcer`;
+const description =
+  tier === 'restricted'
+    ? `${p.workerBrand} — ${p.relationship}. No public self-serve worker portal: ${p.notes ?? p.typicalWork}`
+    : `Is ${p.workerBrand} legit? ${p.relationship} (ownership confidence: ${p.ownershipConfidence.toLowerCase()}). ${p.typicalWork}.`;
 ---
 
 <Layout title={title} description={description} canonicalPath={`/providers/${p.slug}`} jsonLd={jsonLd}>
@@ -44,10 +85,10 @@ const description = `Is ${p.workerBrand} legit? ${p.relationship} (ownership con
   <ProviderDetail
     provider={provider}
     providerRoles={providerRoles}
-    backHref="/"
-    backLabel="All expert networks"
-    ctaLabel={`Visit ${p.workerBrand}`}
-    ctaRel="nofollow sponsored"
-    showRoles={true}
+    backHref={tierListingHref(tier)}
+    backLabel={framing.backLabel}
+    ctaLabel={framing.ctaLabel(p.workerBrand)}
+    ctaRel={framing.ctaRel}
+    showRoles={framing.showRoles}
   />
 </Layout>

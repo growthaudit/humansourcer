@@ -1,8 +1,8 @@
 ---
-// Shared body for all three provider-detail routes (/providers/[slug],
-// /gig/[slug], /restricted/[slug]) — same fields, same JSON-LD shape, only
-// the surrounding tier framing (back-link, CTA copy, whether an "Open
-// roles" section makes sense) differs per tier.
+// Shared body for the single /providers/[slug] detail route, used for every
+// tier — same fields, same JSON-LD shape, only the surrounding tier framing
+// (back-link, CTA copy, whether an "Open roles" section makes sense) differs
+// per tier (see TIER_FRAMING in providers/[slug].astro).
 import {
   accessModelCategory,
   geographyScope,

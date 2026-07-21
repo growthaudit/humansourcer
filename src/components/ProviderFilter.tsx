@@ -11,7 +11,7 @@ export type AudienceTier = 'expert' | 'gig' | 'restricted';
 
 export interface ProviderRow {
   slug: string;
-  href: string; // tier-specific detail URL: /providers/{slug}, /gig/{slug}, or /restricted/{slug}
+  href: string; // canonical detail URL: /providers/{slug} for every tier
   workerBrand: string;
   parentGroup: string;
   typicalWork: string;
@@ -23,6 +23,10 @@ export interface ProviderRow {
 
 interface Props {
   providers: ProviderRow[];
+  // Tier-scoped listing pages (/providers/gig/, /providers/experts/, ...)
+  // pass rows pre-filtered to one tier, so the tier dropdown would be
+  // redundant (and misleadingly imply other tiers are selectable here).
+  hideTierFilter?: boolean;
 }
 
 type SortKey = 'name' | 'parent';
@@ -33,16 +37,23 @@ const TIER_LABELS: Record<AudienceTier, string> = {
   restricted: 'Restricted',
 };
 
-export default function ProviderFilter({ providers }: Props) {
+export default function ProviderFilter({ providers, hideTierFilter }: Props) {
   const [tier, setTier] = useState<string>('all');
   const [domain, setDomain] = useState<string>('all');
   const [access, setAccess] = useState<string>('all');
   const [geo, setGeo] = useState<string>('all');
+  const [company, setCompany] = useState<string>('all');
   const [sort, setSort] = useState<SortKey>('name');
 
   const allDomains = useMemo(() => {
     const set = new Set<string>();
     providers.forEach((p) => p.domainTags.forEach((d) => set.add(d)));
+    return [...set].sort();
+  }, [providers]);
+
+  const allCompanies = useMemo(() => {
+    const set = new Set<string>();
+    providers.forEach((p) => set.add(p.parentGroup));
     return [...set].sort();
   }, [providers]);
 
@@ -52,6 +63,7 @@ export default function ProviderFilter({ providers }: Props) {
       if (domain !== 'all' && !p.domainTags.includes(domain)) return false;
       if (access !== 'all' && p.accessModelCategory !== access) return false;
       if (geo !== 'all' && p.geographyScope !== geo) return false;
+      if (company !== 'all' && p.parentGroup !== company) return false;
       return true;
     });
     rows = rows.slice().sort((a, b) => {
@@ -59,22 +71,24 @@ export default function ProviderFilter({ providers }: Props) {
       return a[key].localeCompare(b[key]);
     });
     return rows;
-  }, [providers, tier, domain, access, geo, sort]);
+  }, [providers, tier, domain, access, geo, company, sort]);
 
   return (
     <div>
       <div class="mb-6 flex flex-wrap gap-3">
-        <select
-          class="rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink-primary"
-          value={tier}
-          onChange={(e) => setTier((e.target as HTMLSelectElement).value)}
-          aria-label="Filter by tier"
-        >
-          <option value="all">All tiers</option>
-          {Object.entries(TIER_LABELS).map(([value, label]) => (
-            <option value={value}>{label}</option>
-          ))}
-        </select>
+        {!hideTierFilter && (
+          <select
+            class="rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink-primary"
+            value={tier}
+            onChange={(e) => setTier((e.target as HTMLSelectElement).value)}
+            aria-label="Filter by tier"
+          >
+            <option value="all">All tiers</option>
+            {Object.entries(TIER_LABELS).map(([value, label]) => (
+              <option value={value}>{label}</option>
+            ))}
+          </select>
+        )}
 
         <select
           class="rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink-primary"
@@ -109,6 +123,18 @@ export default function ProviderFilter({ providers }: Props) {
           <option value="all">All geographies</option>
           {Object.entries(GEOGRAPHY_LABELS).map(([value, label]) => (
             <option value={value}>{label}</option>
+          ))}
+        </select>
+
+        <select
+          class="rounded border border-border-strong bg-surface px-3 py-2 text-sm text-ink-primary"
+          value={company}
+          onChange={(e) => setCompany((e.target as HTMLSelectElement).value)}
+          aria-label="Filter by company"
+        >
+          <option value="all">All companies</option>
+          {allCompanies.map((c) => (
+            <option value={c}>{c}</option>
           ))}
         </select>
 

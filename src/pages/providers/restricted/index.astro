@@ -1,15 +1,29 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+import Layout from '../../../layouts/Layout.astro';
+import ProviderFilter from '../../../components/ProviderFilter';
 import { getCollection } from 'astro:content';
-import { itemListJsonLd } from '../../lib/jsonld';
-import { providerHref } from '../../lib/provider-url';
+import { accessModelCategory, geographyScope } from '../../../lib/taxonomy';
+import { providerHref } from '../../../lib/provider-url';
+import { itemListJsonLd } from '../../../lib/jsonld';
 
 const allProviders = await getCollection('providers');
 const restricted = allProviders
   .filter((p) => p.data.audienceTiers.includes('restricted'))
   .sort((a, b) => a.data.workerBrand.localeCompare(b.data.workerBrand));
 
-const listUrl = new URL('/restricted/', Astro.site).toString();
+const rows = restricted.map((p) => ({
+  slug: p.data.slug,
+  href: providerHref(p.data),
+  workerBrand: p.data.workerBrand,
+  parentGroup: p.data.parentGroup,
+  typicalWork: p.data.typicalWork,
+  domainTags: p.data.domainTags,
+  audienceTiers: p.data.audienceTiers,
+  accessModelCategory: accessModelCategory(p.data.accessModel),
+  geographyScope: geographyScope(p.data.geography),
+}));
+
+const listUrl = new URL('/providers/restricted/', Astro.site).toString();
 const jsonLd = itemListJsonLd(
   restricted.map((p) => ({
     name: p.data.workerBrand,
@@ -23,30 +37,22 @@ const description =
   'Real human-data annotation and AI-training companies (Karya, Innodata, Cogito Tech, Encord, and others) with no public self-serve worker portal — managed or partner-led hiring only.';
 ---
 
-<Layout title={title} description={description} canonicalPath="/restricted/" jsonLd={jsonLd}>
+<Layout title={title} description={description} canonicalPath="/providers/restricted/" jsonLd={jsonLd}>
   <h1 class="text-3xl font-bold tracking-tight">Managed &amp; restricted-access companies</h1>
   <p class="mt-2 max-w-2xl text-ink-secondary">
     {restricted.length} real human-data annotation and AI-training companies with no public
     self-serve worker portal — hiring happens through managed services, partner organisations, or
     ordinary corporate job vacancies rather than an evergreen contributor signup flow. Listed here
-    for completeness, not as an application funnel.
+    for completeness, not as an application funnel. Filter by domain or company below.
   </p>
   <p class="mt-2 max-w-2xl text-ink-secondary">
     Looking for somewhere you can actually apply today? See the
-    <a href="/" class="underline">expert networks</a> or
-    <a href="/gig/" class="underline">gig platforms</a> directories.
+    <a href="/providers/experts/" class="underline">expert networks</a> or
+    <a href="/providers/gig/" class="underline">gig platforms</a> directories, or
+    <a href="/providers/" class="underline">browse all providers</a>.
   </p>
 
-  <div class="mt-8 grid gap-4 sm:grid-cols-2">
-    {restricted.map((p) => (
-      <a
-        href={providerHref(p.data)}
-        class="block rounded-lg border border-border p-4 transition-colors duration-200 ease-out hover:border-border-strong hover:shadow-sm"
-      >
-        <div class="text-xs uppercase tracking-wide text-ink-tertiary">{p.data.parentGroup}</div>
-        <div class="mt-1 font-medium text-ink-primary">{p.data.workerBrand}</div>
-        <p class="mt-1 text-sm text-ink-secondary">{p.data.typicalWork}</p>
-      </a>
-    ))}
+  <div class="mt-8">
+    <ProviderFilter providers={rows} hideTierFilter client:load />
   </div>
 </Layout>

@@ -1,0 +1,56 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import ProviderFilter from '../../../components/ProviderFilter';
+import { getCollection } from 'astro:content';
+import { accessModelCategory, geographyScope } from '../../../lib/taxonomy';
+import { providerHref } from '../../../lib/provider-url';
+import { itemListJsonLd } from '../../../lib/jsonld';
+
+const allProviders = await getCollection('providers');
+const experts = allProviders
+  .filter((p) => p.data.audienceTiers.includes('expert'))
+  .sort((a, b) => a.data.workerBrand.localeCompare(b.data.workerBrand));
+
+const rows = experts.map((p) => ({
+  slug: p.data.slug,
+  href: providerHref(p.data),
+  workerBrand: p.data.workerBrand,
+  parentGroup: p.data.parentGroup,
+  typicalWork: p.data.typicalWork,
+  domainTags: p.data.domainTags,
+  audienceTiers: p.data.audienceTiers,
+  accessModelCategory: accessModelCategory(p.data.accessModel),
+  geographyScope: geographyScope(p.data.geography),
+}));
+
+const listUrl = new URL('/providers/experts/', Astro.site).toString();
+const jsonLd = itemListJsonLd(
+  experts.map((p) => ({
+    name: p.data.workerBrand,
+    url: new URL(providerHref(p.data), Astro.site).toString(),
+  })),
+  listUrl
+);
+
+const title = 'Expert AI-Training Networks | HumanSourcer';
+const description = `Compare ${experts.length} expert-tier AI-training networks that recruit domain specialists — lawyers, physicians, engineers, and scientists — like Mercor, Alignerr, and Surge AI. Access model, geography, and ownership, each with a cited source.`;
+---
+
+<Layout title={title} description={description} canonicalPath="/providers/experts/" jsonLd={jsonLd}>
+  <h1 class="text-3xl font-bold tracking-tight">Expert AI-training networks</h1>
+  <p class="mt-2 max-w-2xl text-ink-secondary">
+    {experts.length} expert networks that recruit domain specialists — lawyers, physicians,
+    engineers, scientists, and more — for AI-training and data-annotation work. Filter by domain,
+    company, access model, and geography. Every ownership and status claim links to its public
+    source.
+  </p>
+  <p class="mt-2 max-w-2xl text-ink-secondary">
+    Looking for open-to-anyone task work instead? See the
+    <a href="/providers/gig/" class="underline">gig platforms</a> directory, or
+    <a href="/providers/" class="underline">browse all providers</a>.
+  </p>
+
+  <div class="mt-8">
+    <ProviderFilter providers={rows} hideTierFilter client:load />
+  </div>
+</Layout>

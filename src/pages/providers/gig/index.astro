@@ -1,10 +1,10 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import ProviderFilter from '../../components/ProviderFilter';
+import Layout from '../../../layouts/Layout.astro';
+import ProviderFilter from '../../../components/ProviderFilter';
 import { getCollection } from 'astro:content';
-import { accessModelCategory, geographyScope } from '../../lib/taxonomy';
-import { providerHref } from '../../lib/provider-url';
-import { itemListJsonLd } from '../../lib/jsonld';
+import { accessModelCategory, geographyScope } from '../../../lib/taxonomy';
+import { providerHref } from '../../../lib/provider-url';
+import { itemListJsonLd } from '../../../lib/jsonld';
 
 const allProviders = await getCollection('providers');
 const gigs = allProviders
@@ -23,7 +23,7 @@ const rows = gigs.map((p) => ({
   geographyScope: geographyScope(p.data.geography),
 }));
 
-const listUrl = new URL('/gig/', Astro.site).toString();
+const listUrl = new URL('/providers/gig/', Astro.site).toString();
 const jsonLd = itemListJsonLd(
   gigs.map((p) => ({
     name: p.data.workerBrand,
@@ -37,19 +37,20 @@ const description =
   'Compare gig-tier AI-training task marketplaces like DataAnnotation, Outlier, Remotasks, and Clickworker — access model, geography, and ownership, each with a cited source.';
 ---
 
-<Layout title={title} description={description} canonicalPath="/gig/" jsonLd={jsonLd}>
+<Layout title={title} description={description} canonicalPath="/providers/gig/" jsonLd={jsonLd}>
   <h1 class="text-3xl font-bold tracking-tight">Gig &amp; task-based AI-training platforms</h1>
   <p class="mt-2 max-w-2xl text-ink-secondary">
     {gigs.length} task-marketplace platforms where anyone can sign up to complete AI-training and
-    data-annotation tasks — no domain expertise required for most work. Filter by domain, access
-    model, and geography. Every ownership and status claim links to its public source.
+    data-annotation tasks — no domain expertise required for most work. Filter by domain, company,
+    access model, and geography. Every ownership and status claim links to its public source.
   </p>
   <p class="mt-2 max-w-2xl text-ink-secondary">
     Looking for domain-expert roles instead? See the
-    <a href="/" class="underline">expert AI-training networks</a> directory.
+    <a href="/providers/experts/" class="underline">expert AI-training networks</a> directory, or
+    <a href="/providers/" class="underline">browse all providers</a>.
   </p>
 
   <div class="mt-8">
-    <ProviderFilter providers={rows} client:load />
+    <ProviderFilter providers={rows} hideTierFilter client:load />
   </div>
 </Layout>

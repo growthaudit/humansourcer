@@ -23,15 +23,28 @@ const noindexRolePaths = await getNoindexRolePaths();
 const roleLastmod = await getRoleLastmodMap();
 // Trailing slash matters: Astro emits /providers/[slug]/index.html, so the
 // sitemap's actual pathname is "/providers/slug/" — a bare "/providers/slug"
-// key here would silently never match.
+// key here would silently never match. Every provider (any tier) now has a
+// /providers/[slug]/ page, not just the expert tier.
 const providerLastmod = new Map(
-  providers.filter((p) => p.audienceTier === 'expert').map((p) => [`/providers/${p.slug}/`, p.lastChecked])
+  providers.map((p) => [`/providers/${p.slug}/`, p.lastChecked])
 );
 const latestRoleLastmod = [...roleLastmod.values()].sort().at(-1);
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://www.humansourcer.com',
+  // Gig and Providers used to be separate route trees (/gig/*, /restricted/*,
+  // /providers/*); they're now amalgamated under /providers/ with tier-scoped
+  // listings (/providers/gig/, /providers/experts/, /providers/restricted/)
+  // and one flat /providers/[slug] detail namespace. These 301s preserve any
+  // link equity/indexing the old paths already have.
+  redirects: {
+    '/providers': '/',
+    '/gig': '/providers/gig',
+    '/gig/[slug]': '/providers/[slug]',
+    '/restricted': '/providers/restricted',
+    '/restricted/[slug]': '/providers/[slug]',
+  },
   integrations: [
     sitemap({
       filter: (page) => {

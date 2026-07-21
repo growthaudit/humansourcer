@@ -43,11 +43,13 @@ const description = `Compare ${allProviders.length} AI-training and data-annotat
 <Layout title={title} description={description} canonicalPath="/" jsonLd={jsonLd}>
   <h1 class="text-3xl font-bold tracking-tight">AI-training &amp; data-annotation providers</h1>
   <p class="mt-2 max-w-2xl text-ink-secondary">
-    {allProviders.length} providers across three tiers: {expertCount} expert networks that recruit
-    domain specialists (lawyers, physicians, engineers), {gigCount} gig/task platforms open to
-    anyone, and {restrictedCount} managed workforces with no public self-serve worker portal.
-    Filter by tier, domain, access model, and geography below — every ownership and status claim
-    links to its public source.
+    {allProviders.length} providers across three tiers: {expertCount}
+    <a href="/providers/experts/" class="underline">expert networks</a> that recruit domain
+    specialists (lawyers, physicians, engineers), {gigCount}
+    <a href="/providers/gig/" class="underline">gig/task platforms</a> open to anyone, and {restrictedCount}
+    <a href="/providers/restricted/" class="underline">managed workforces</a> with no public
+    self-serve worker portal. Filter by tier, domain, company, access model, and geography below —
+    every ownership and status claim links to its public source.
   </p>
   <p class="mt-2 max-w-2xl text-ink-secondary">
     Looking for open positions instead? <a href="/roles/" class="underline">Browse all open roles</a>,
