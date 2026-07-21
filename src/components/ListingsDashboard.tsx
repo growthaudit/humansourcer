@@ -6,6 +6,7 @@ import KpiCards from './analytics/KpiCards';
 import TrendChart from './analytics/TrendChart';
 import ValuationChart from './analytics/ValuationChart';
 import MarketProviderChart from './analytics/MarketProviderChart';
+import ProviderBubbleChart from './analytics/ProviderBubbleChart';
 import ListingsTable from './analytics/ListingsTable';
 
 // This page is fully client-rendered content (unlike /roles/*, there's no
@@ -63,6 +64,8 @@ export default function ListingsDashboard({ initialRows }: Props) {
       </div>
 
       <MarketProviderChart rows={filteredRows} />
+
+      <ProviderBubbleChart rows={filteredRows} />
 
       <ListingsTable rows={filteredRows} />
     </div>
