@@ -117,11 +117,39 @@ function isHourlyUnit(unit: string | null): boolean {
 // pay (no per-hour figure exists to average) and for unrecognized units
 // (real pay, but not confidently a rate). Never derived from pay_text: only
 // vetto/mercor populate pay_min/pay_max with genuine structured data, per
-// the schema comment on those columns.
+// the schema comment on those columns. Prefers pay_max ("up to" figure) over
+// pay_min when a range exists — same convention parseTextRate() below uses.
 export function hourlyRate(role: PayInput): number | null {
   if (role.pay_min == null) return null;
   if (!isHourlyUnit(role.pay_unit)) return null;
   return role.pay_max ?? role.pay_min;
+}
+
+// Pulls a dollar figure out of free-text pay strings like "$18-25/hr" —
+// prefers the upper ("up to") bound when a range is given, same as
+// hourlyRate() above. Returns null for text with no parseable $ figure.
+function parseTextRate(payText: string): number | null {
+  const match = payText.match(/\$(\d+(?:\.\d+)?)(?:-(\d+(?:\.\d+)?))?/);
+  if (!match) return null;
+  return match[2] ? Number(match[2]) : Number(match[1]);
+}
+
+// The single numeric "amount" for a role, structured pay first, falling back
+// to a parsed pay_text figure — this is what powers the /market-data/
+// dashboard's rate column, sort, and averages. Excludes project/package-based
+// pay (a lump sum isn't comparable to a per-hour figure) and the Turing
+// referral-bonus denylist, same guards payBand() below applies.
+export function payAmount(role: PayInput): number | null {
+  const structured = hourlyRate(role);
+  if (structured != null) return structured;
+  if (
+    role.pay_text &&
+    !PAY_TEXT_NOT_REAL_PAY.has(role.provider_slug) &&
+    !/deliverable|project|package/i.test(role.pay_text)
+  ) {
+    return parseTextRate(role.pay_text);
+  }
+  return null;
 }
 
 function bandForRate(rate: number): PayBand {
@@ -142,11 +170,8 @@ export function payBand(role: PayInput): PayBand {
 
   if (role.pay_text && !PAY_TEXT_NOT_REAL_PAY.has(role.provider_slug)) {
     if (/deliverable|project|package/i.test(role.pay_text)) return 'project-based';
-    const match = role.pay_text.match(/\$(\d+(?:\.\d+)?)(?:-(\d+(?:\.\d+)?))?/);
-    if (match) {
-      const rate = match[2] ? Number(match[2]) : Number(match[1]);
-      return bandForRate(rate);
-    }
+    const rate = parseTextRate(role.pay_text);
+    if (rate != null) return bandForRate(rate);
   }
 
   return 'unspecified';
