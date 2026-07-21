@@ -1,22 +1,52 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import { DOMAIN_TAG_LABELS } from '../lib/taxonomy';
-import { TASK_TYPE_LABELS, LOCATION_BUCKET_LABELS, PAY_BAND_LABELS, type TaskType } from '../lib/role-taxonomy';
+import {
+  TASK_TYPE_LABELS,
+  LOCATION_BUCKET_LABELS,
+  PAY_BAND_LABELS,
+  type TaskType,
+  type LocationBucket,
+} from '../lib/role-taxonomy';
 import type { RoleRow } from '../lib/role-rows';
 
 // IMPORTANT — SEO guardrail, do not remove: this component must NEVER
 // mutate document.querySelector('link[rel=canonical]') or the robots meta
-// tag. The page it's mounted on always server-renders a fixed, bounded set
-// of roles (one hub page, one pagination page); this component only
-// narrows *that already-loaded set* client-side and reflects the choice
-// into the URL query string via history.pushState (shareable/back-button-
-// friendly), it never fetches a different/larger dataset and never claims
-// to be a new indexable page. Combining facets this way is intentionally
-// NOT a substitute for the single-facet hub pages (/roles/domain/[tag]/
-// etc.) — those stay the crawlable surface; this is a client-side
-// convenience layered on top of whatever the current page already rendered.
+// tag, and never claims to be a new indexable page. The page it's mounted
+// on always server-renders a fixed, bounded set of roles (one hub page,
+// one pagination page) — that server-rendered set (and its canonical URL)
+// is unaffected by anything below.
+//
+// What DOES change client-side: once mounted, this component fetches
+// /roles-data.json (a build-time snapshot of every eligible role) so the
+// dropdowns and search can operate on the real, full dataset rather than
+// just the ~24 roles the current page happens to contain — otherwise "All
+// companies" only ever lists whichever companies landed on this page.
+// `scope` narrows that full dataset down to whatever facet this page is
+// already pinned to (e.g. one company's hub), so a hub page's filters
+// still can't leak roles from outside that facet. The default (no active
+// filter) view still renders exactly the server-rendered `roles` prop, so
+// the bounded-page/pagination behavior and no-JS experience are unchanged
+// — the full dataset only takes over once the visitor actually filters.
+
+interface Scope {
+  providerSlug?: string;
+  domainTag?: string;
+  taskType?: TaskType;
+  locationBucket?: LocationBucket;
+}
 
 interface Props {
   roles: RoleRow[];
+  scope?: Scope;
+}
+
+function matchesScope(r: RoleRow, scope?: Scope): boolean {
+  if (!scope) return true;
+  if (scope.providerSlug && r.providerSlug !== scope.providerSlug) return false;
+  if (scope.domainTag && !r.domainTags.includes(scope.domainTag)) return false;
+  if (scope.taskType && r.taskType !== scope.taskType) return false;
+  if (scope.locationBucket && r.locationBucket !== scope.locationBucket) return false;
+  return true;
 }
 
 const ALL = 'all';
@@ -26,13 +56,40 @@ function readParam(name: string): string {
   return new URLSearchParams(window.location.search).get(name) ?? ALL;
 }
 
-export default function RolesFilter({ roles }: Props) {
+export default function RolesFilter({ roles, scope }: Props) {
   const [domain, setDomain] = useState(ALL);
   const [company, setCompany] = useState(ALL);
   const [task, setTask] = useState(ALL);
   const [location, setLocation] = useState(ALL);
   const [pay, setPay] = useState(ALL);
   const [query, setQuery] = useState('');
+  const [fullRoles, setFullRoles] = useState<RoleRow[] | null>(null);
+
+  // Fetch the full dataset once on mount. Failure just means the dropdowns
+  // and search stay scoped to the server-rendered page, same as before —
+  // no worse than the pre-fix behavior.
+  useEffect(() => {
+    fetch('/roles-data.json')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (Array.isArray(data)) setFullRoles(data);
+      })
+      .catch(() => {});
+  }, []);
+
+  const scopedFullRoles = useMemo(
+    () => (fullRoles ? fullRoles.filter((r) => matchesScope(r, scope)) : null),
+    [fullRoles, scope]
+  );
+
+  const isFilterActive =
+    domain !== ALL || company !== ALL || task !== ALL || location !== ALL || pay !== ALL || query.trim() !== '';
+
+  // The pool everything below searches/lists options from: the full
+  // (scoped) dataset once it's loaded and the visitor has actually
+  // engaged a filter; otherwise the original server-rendered page slice.
+  const searchPool = isFilterActive && scopedFullRoles ? scopedFullRoles : roles;
+  const optionsPool = scopedFullRoles ?? roles;
 
   // Restore filter state from the URL on mount (shareable/bookmarkable
   // filtered views) — read-only sync, never touches canonical/robots.
@@ -60,25 +117,25 @@ export default function RolesFilter({ roles }: Props) {
 
   const allDomains = useMemo(() => {
     const set = new Set<string>();
-    roles.forEach((r) => r.domainTags.forEach((d) => set.add(d)));
+    optionsPool.forEach((r) => r.domainTags.forEach((d) => set.add(d)));
     return [...set].sort();
-  }, [roles]);
+  }, [optionsPool]);
 
   const allCompanies = useMemo(() => {
     const map = new Map<string, string>();
-    roles.forEach((r) => map.set(r.providerSlug, r.workerBrand));
+    optionsPool.forEach((r) => map.set(r.providerSlug, r.workerBrand));
     return [...map.entries()].sort((a, b) => a[1].localeCompare(b[1]));
-  }, [roles]);
+  }, [optionsPool]);
 
   const allTaskTypes = useMemo(() => {
     const set = new Set<TaskType>();
-    roles.forEach((r) => set.add(r.taskType));
+    optionsPool.forEach((r) => set.add(r.taskType));
     return [...set];
-  }, [roles]);
+  }, [optionsPool]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return roles.filter((r) => {
+    return searchPool.filter((r) => {
       if (domain !== ALL && !r.domainTags.includes(domain)) return false;
       if (company !== ALL && r.providerSlug !== company) return false;
       if (task !== ALL && r.taskType !== task) return false;
@@ -87,7 +144,7 @@ export default function RolesFilter({ roles }: Props) {
       if (q && !r.title.toLowerCase().includes(q) && !r.workerBrand.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [roles, domain, company, task, location, pay, query]);
+  }, [searchPool, domain, company, task, location, pay, query]);
 
   return (
     <div>
@@ -162,7 +219,7 @@ export default function RolesFilter({ roles }: Props) {
         </select>
 
         <span class="self-center text-sm text-ink-secondary">
-          {filtered.length} of {roles.length} roles
+          {filtered.length} of {searchPool.length} roles
         </span>
       </div>
 

@@ -59,7 +59,7 @@ const description = `${stats.totalRoles} open ${String(label).toLowerCase()} rol
   <p class="mt-2 max-w-2xl text-ink-secondary">{blurb}</p>
 
   <div class="mt-8">
-    <RolesFilter roles={rows} client:load />
+    <RolesFilter roles={rows} scope={{ taskType: taskTypeValue }} client:load />
   </div>
 
   {page.lastPage > 1 && (
