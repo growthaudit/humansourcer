@@ -9,10 +9,7 @@ import { itemListJsonLd, breadcrumbListJsonLd } from '../../lib/jsonld';
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
   const PAGE_SIZE = 24;
   const eligible = await getEligibleActiveRoles();
-  const sorted = eligible
-    .slice()
-    .sort((a, b) => new Date(b.role.last_seen_at).getTime() - new Date(a.role.last_seen_at).getTime());
-  return paginate(sorted, { pageSize: PAGE_SIZE });
+  return paginate(eligible, { pageSize: PAGE_SIZE });
 }
 
 interface Props {

@@ -2,6 +2,7 @@
 // row shape RolesFilter.tsx renders/filters client-side. Lives here (not in
 // the component) so every /roles/* page builds this the same way.
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { createHash } from 'node:crypto';
 import { getAllRolesForPages, rolePagePath, type FullRole } from './roles';
 import { taskType, locationBucket, payBand, type TaskType, type LocationBucket, type PayBand } from './role-taxonomy';
 import { geographyScope } from './taxonomy';
@@ -31,11 +32,30 @@ export async function getEligibleActiveRoles(): Promise<RoleWithProvider[]> {
     const provider = eligibleProviders.get(role.provider_slug);
     if (provider) result.push({ role, provider });
   }
-  return result;
+  return sortByFreshest(result);
+}
+
+// Scrapes run provider-by-provider, so within a single day every role from
+// the same provider gets a near-identical last_seen_at — sorting on the raw
+// timestamp effectively sorts by scrape order, i.e. one provider's whole
+// batch back to back. Bucketing to the day (still freshest-first) and then
+// breaking ties with a stable hash of the role id interleaves providers
+// within a day while staying deterministic across builds (so pagination
+// and the JSON snapshot don't reshuffle on every rebuild).
+function dayBucket(timestamp: string): string {
+  return timestamp.slice(0, 10);
+}
+
+function shuffleKey(id: string): string {
+  return createHash('sha1').update(id).digest('hex');
 }
 
 function sortByFreshest(items: RoleWithProvider[]): RoleWithProvider[] {
-  return items.slice().sort((a, b) => new Date(b.role.last_seen_at).getTime() - new Date(a.role.last_seen_at).getTime());
+  return items.slice().sort((a, b) => {
+    const dayDiff = dayBucket(b.role.last_seen_at).localeCompare(dayBucket(a.role.last_seen_at));
+    if (dayDiff !== 0) return dayDiff;
+    return shuffleKey(a.role.id).localeCompare(shuffleKey(b.role.id));
+  });
 }
 
 // A role's provider can have multiple domainTags, so a role legitimately

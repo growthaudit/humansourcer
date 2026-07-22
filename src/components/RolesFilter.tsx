@@ -90,6 +90,7 @@ export default function RolesFilter({ roles, scope }: Props) {
   // engaged a filter; otherwise the original server-rendered page slice.
   const searchPool = isFilterActive && scopedFullRoles ? scopedFullRoles : roles;
   const optionsPool = scopedFullRoles ?? roles;
+  const totalCount = scopedFullRoles ? scopedFullRoles.length : roles.length;
 
   // Restore filter state from the URL on mount (shareable/bookmarkable
   // filtered views) — read-only sync, never touches canonical/robots.
@@ -219,7 +220,7 @@ export default function RolesFilter({ roles, scope }: Props) {
         </select>
 
         <span class="self-center text-sm text-ink-secondary">
-          {filtered.length} of {searchPool.length} roles
+          {filtered.length} of {totalCount} roles
         </span>
       </div>
 
