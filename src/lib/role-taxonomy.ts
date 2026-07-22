@@ -26,6 +26,7 @@ export type PayBand = 'unspecified' | 'under-20' | '20-40' | '40-plus' | 'projec
 
 interface TaskTypeInput {
   title: string;
+  description?: string | null;
 }
 
 // Order matters: first match wins. Specific/reliable signals go first
@@ -36,25 +37,50 @@ interface TaskTypeInput {
 // checked early, it would swallow roles that have a real, more specific
 // signal elsewhere in the title (e.g. "SQL Coding Specialist - Freelance AI
 // Trainer Project" is coding-swe, not generically "AI training").
+//
+// Confirmed live against the real dataset (2026-07-22, ~2900 active roles):
+// a large slice of "Uncategorized" titles are bare domain-expert postings
+// ("Physics Expert", "Accounting Expert", "Dutch Language Expert", "AI Task
+// Designer") from handshake-ai/mercor-experts/micro1/alignerr/sme-careers —
+// these three additions (voice, language expert, and the AI-task/QA/SME
+// terms folded into model-evaluation) were sized directly off that sample.
 const TASK_TYPE_RULES: [RegExp, TaskType][] = [
-  [/\bvoice actor|voice acting|\baudio\b|sound engineering|\bspeech\b/i, 'voice-audio'],
-  [/\btranslat(e|or|ion)|language specialist|\blinguist|dialect specialist/i, 'translation-linguistics'],
+  [/\bvoice actor|voice acting|\bvoice\b|\baudio\b|sound engineering|\bspeech\b/i, 'voice-audio'],
+  [/\btranslat(e|or|ion)|language specialist|language expert|\bbilingual\b|\blinguist|dialect specialist/i, 'translation-linguistics'],
   [/\bannotat|labell?ing|data (scraping|collection)|\bscraping\b/i, 'data-annotation-labeling'],
   [/software engineer|\bswe\b|\bdeveloper\b|\bcoding\b|programm(er|ing)|full ?stack|front.?end|back.?end|\bpython\b|javascript|typescript|\bjava\b|\bc#|\bc\+\+|\bsql\b|\bkotlin\b|\bhtml\b/i, 'coding-swe'],
   [/customer (support|service)|support agent|\boperations\b|\bops\b|implementation specialist|\bhr specialist|human resources/i, 'customer-support-ops'],
   [/\bwrit(er|ing)\b|\beditor\b|\bediting\b|\bcontent\b|copy ?edit|proofread/i, 'writing-editing'],
   [/\banalyst\b|\bresearch\b|analytics engineer/i, 'research-analysis'],
-  [/\bevaluat|\breviewer\b|red.?team|task author|ai train(er|ing)|\bbenchmark\b|\brater\b|\brating\b/i, 'model-evaluation'],
+  [
+    /\bevaluat|\breviewer\b|red.?team|task author|ai train(er|ing)|\bbenchmark\b|\brater\b|\brating\b|ai task (designer|creator)|quality assurance( lead)?|\bqal\b|subject matter expert|\bsme\b|prompt engineer/i,
+    'model-evaluation',
+  ],
 ];
 
-export function taskType({ title }: TaskTypeInput): TaskType {
-  // Deliberately title-only, not title+category: category is unreliable
-  // across sources — e.g. mindrift's is a constant "Creator (Writer)" for
-  // every role (not a real category), sepal's is an education level, g2i's
-  // is just the internal team name. Mixing those in would systematically
-  // mislabel entire sources rather than just missing a weak signal.
+export function taskType({ title, description }: TaskTypeInput): TaskType {
+  // Deliberately title-only for the first pass, not title+category: category
+  // is unreliable across sources — e.g. mindrift's is a constant "Creator
+  // (Writer)" for every role (not a real category), sepal's is an education
+  // level, g2i's is just the internal team name. Mixing those in would
+  // systematically mislabel entire sources rather than just missing a weak
+  // signal.
   for (const [pattern, type] of TASK_TYPE_RULES) {
     if (pattern.test(title)) return type;
+  }
+  // Title alone leaves a real slice of roles unclassified — bare
+  // domain-expert titles like "Accounting Expert" or "Physics Expert" say
+  // nothing about the work by themselves, but their descriptions do (e.g.
+  // "evaluating how well AI systems perform... scoring completed work
+  // samples" — a clean model-evaluation match). Only consulted once title
+  // has already failed every rule, so a role whose title is already
+  // unambiguous (e.g. "Full-Stack Developer") can never be silently
+  // reclassified by an incidental keyword deeper in its description — this
+  // is a fallback pass, not a merged title+description match.
+  if (description) {
+    for (const [pattern, type] of TASK_TYPE_RULES) {
+      if (pattern.test(description)) return type;
+    }
   }
   return 'other';
 }
