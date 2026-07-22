@@ -54,8 +54,13 @@ export default function KpiCards({ rows, selectedTaskTypes, onToggleTaskType }: 
     const rated = rows.filter((r) => r.hourlyRate != null);
     const avgRate = rated.length ? rated.reduce((sum, r) => sum + (r.hourlyRate ?? 0), 0) / rated.length : null;
     const providerCount = new Set(rows.map((r) => r.providerSlug)).size;
-    const topTaskType = mostCommon(rows.map((r) => r.taskType));
-    return { total: rows.length, avgRate, rated: rated.length, providerCount, topTaskType };
+    // Exclude the 'other'/"Uncategorized" catch-all from the headline KPI —
+    // it's a real, useful bucket elsewhere on the page, but "Top use case:
+    // Uncategorized" would read as a broken chart, not a finding, on a page
+    // meant to be a citable source of truth.
+    const categorized = rows.filter((r) => r.taskType !== 'other');
+    const topTaskType = mostCommon(categorized.map((r) => r.taskType));
+    return { total: rows.length, avgRate, rated: rated.length, providerCount, topTaskType, hasCategorized: categorized.length > 0 };
   }, [rows]);
 
   return (
@@ -70,7 +75,13 @@ export default function KpiCards({ rows, selectedTaskTypes, onToggleTaskType }: 
       <Card
         label="Top use case"
         value={stats.topTaskType ? TASK_TYPE_LABELS[stats.topTaskType] : '—'}
-        caption={stats.topTaskType ? 'click to filter' : undefined}
+        caption={
+          stats.topTaskType
+            ? 'click to filter'
+            : stats.total > 0 && !stats.hasCategorized
+              ? 'mostly uncategorized listings'
+              : undefined
+        }
         active={stats.topTaskType != null && selectedTaskTypes.includes(stats.topTaskType)}
         onClick={stats.topTaskType ? () => onToggleTaskType(stats.topTaskType!) : undefined}
       />

@@ -7,6 +7,7 @@ import KpiCards from './analytics/KpiCards';
 import TrendChart from './analytics/TrendChart';
 import ValuationChart from './analytics/ValuationChart';
 import MarketProviderChart from './analytics/MarketProviderChart';
+import PayBandChart from './analytics/PayBandChart';
 import ProviderBubbleChart from './analytics/ProviderBubbleChart';
 import ProviderRadarChart from './analytics/ProviderRadarChart';
 import DemandHeatmap from './analytics/DemandHeatmap';
@@ -72,6 +73,8 @@ export default function ListingsDashboard({ initialRows }: Props) {
         <TrendChart rows={filteredRows} selectedTaskTypes={filters.taskTypes} onToggleTaskType={toggleTaskType} />
         <ValuationChart rows={filteredRows} selectedCategories={filters.categories} selectedTaskTypes={filters.taskTypes} onToggleCategory={toggleCategory} onToggleTaskType={toggleTaskType} />
       </div>
+
+      <PayBandChart rows={filteredRows} selectedProviders={filters.providers} onToggleProvider={toggleProvider} />
 
       <MarketProviderChart rows={filteredRows} selectedProviders={filters.providers} onToggleProvider={toggleProvider} />
 

@@ -1,7 +1,8 @@
 import { useMemo } from 'preact/hooks';
 import type { ListingAnalyticsRow } from '../../lib/listings-analytics';
+import { TASK_TYPE_LABELS } from '../../lib/role-taxonomy';
 import { seriesColor, OTHER_COLOR } from './palette';
-import { useChartTooltip, ChartTooltip } from './ChartTooltip';
+import { useChartTooltip, ChartTooltip, useContainerWidth } from './ChartTooltip';
 
 interface Props {
   rows: ListingAnalyticsRow[];
@@ -9,19 +10,26 @@ interface Props {
   onToggleProvider: (slug: string) => void;
 }
 
-const TOP_USE_CASES = 6;
+// All 9 use cases are always shown (see DemandHeatmap.tsx for the same
+// policy) — only providers (62 of them) get a top-N-plus-Other treatment.
+const ALL_USE_CASE_LABELS = Object.values(TASK_TYPE_LABELS);
 const TOP_PROVIDERS = 8;
 const OTHER_SLUG = '__other__';
 
 const W = 760;
 const H = 300;
-const PAD = { top: 10, right: 10, bottom: 46, left: 36 };
+const PAD = { top: 10, right: 10, bottom: 56, left: 36 };
+// Below this rendered pixel width, horizontal centered labels no longer fit
+// nine categories legibly — switch to angled labels instead of just
+// truncating further, matching common axis-label practice in BI tools.
+const ROTATE_BELOW_PX = 620;
 
 export default function MarketProviderChart({ rows, selectedProviders, onToggleProvider }: Props) {
   const { containerRef, tooltip, showTooltip, hideTooltip } = useChartTooltip();
+  const { ref: widthRef, width: measuredWidth } = useContainerWidth<HTMLDivElement>();
 
   const { useCases, providers, matrix, maxTotal } = useMemo(() => {
-    const useCaseTotals = new Map<string, number>();
+    const useCaseTotals = new Map<string, number>(ALL_USE_CASE_LABELS.map((l) => [l, 0]));
     const providerTotals = new Map<string, string>(); // slug -> brand
     const providerCounts = new Map<string, number>();
     for (const r of rows) {
@@ -29,9 +37,7 @@ export default function MarketProviderChart({ rows, selectedProviders, onToggleP
       providerTotals.set(r.providerSlug, r.workerBrand);
       providerCounts.set(r.providerSlug, (providerCounts.get(r.providerSlug) ?? 0) + 1);
     }
-    const topUseCases = [...useCaseTotals.entries()].sort((a, b) => b[1] - a[1]).slice(0, TOP_USE_CASES).map(([l]) => l);
-    const hasOtherUseCase = rows.some((r) => !topUseCases.includes(r.taskTypeLabel));
-    const useCaseLabels = hasOtherUseCase ? [...topUseCases, 'Other use cases'] : topUseCases;
+    const useCaseLabels = ALL_USE_CASE_LABELS.slice().sort((a, b) => (useCaseTotals.get(b) ?? 0) - (useCaseTotals.get(a) ?? 0));
 
     const topProviderSlugs = [...providerCounts.entries()]
       .sort((a, b) => b[1] - a[1])
@@ -43,14 +49,13 @@ export default function MarketProviderChart({ rows, selectedProviders, onToggleP
 
     const grid = new Map<string, Map<string, number>>();
     for (const r of rows) {
-      const ucLabel = topUseCases.includes(r.taskTypeLabel) ? r.taskTypeLabel : 'Other use cases';
       const pSlug = topProviderSlugs.includes(r.providerSlug) ? r.providerSlug : OTHER_SLUG;
-      if (!grid.has(ucLabel)) grid.set(ucLabel, new Map());
-      const m = grid.get(ucLabel)!;
+      if (!grid.has(r.taskTypeLabel)) grid.set(r.taskTypeLabel, new Map());
+      const m = grid.get(r.taskTypeLabel)!;
       m.set(pSlug, (m.get(pSlug) ?? 0) + 1);
     }
 
-    const totals = useCaseLabels.map((l) => useCaseTotals.get(l) ?? [...(grid.get(l)?.values() ?? [])].reduce((a, b) => a + b, 0));
+    const totals = useCaseLabels.map((l) => useCaseTotals.get(l) ?? 0);
     const max = Math.max(1, ...totals);
 
     return { useCases: useCaseLabels, providers: providerList, matrix: grid, maxTotal: max };
@@ -58,11 +63,17 @@ export default function MarketProviderChart({ rows, selectedProviders, onToggleP
 
   const plotW = W - PAD.left - PAD.right;
   const plotH = H - PAD.top - PAD.bottom;
-  const barGap = 12;
+  const barGap = 10;
   const barWidth = useCases.length > 0 ? (plotW - barGap * (useCases.length - 1)) / useCases.length : plotW;
 
   const yFromCount = (v: number) => (v / maxTotal) * plotH;
   const isDimmed = (slug: string) => selectedProviders.length > 0 && slug !== OTHER_SLUG && !selectedProviders.includes(slug);
+
+  const scale = measuredWidth > 0 ? measuredWidth / W : 1;
+  const rotateLabels = measuredWidth > 0 && measuredWidth < ROTATE_BELOW_PX;
+  const pixelBarWidth = barWidth * scale;
+  const maxChars = rotateLabels ? 22 : Math.max(4, Math.floor(pixelBarWidth / 5.5));
+  const truncate = (label: string) => (label.length > maxChars ? `${label.slice(0, maxChars - 1)}…` : label);
 
   return (
     <div ref={containerRef} class="relative rounded-lg border border-border bg-surface p-4">
@@ -72,7 +83,7 @@ export default function MarketProviderChart({ rows, selectedProviders, onToggleP
         Bar height = total listings for that use case. Segment size = one provider's share. Click a segment or legend
         entry to filter by that provider.
       </p>
-      <div class="mt-3 h-72">
+      <div ref={widthRef} class="mt-3 h-80">
         {useCases.length === 0 ? (
           <div class="flex h-full items-center justify-center text-sm text-ink-secondary">
             No listings match these filters.
@@ -89,6 +100,8 @@ export default function MarketProviderChart({ rows, selectedProviders, onToggleP
                 cursorY -= segH;
                 return { ...p, count, y: cursorY, h: segH };
               });
+              const labelX = barX + barWidth / 2;
+              const labelY = H - PAD.bottom + (rotateLabels ? 12 : 14);
               return (
                 <g>
                   {segments.map(
@@ -109,13 +122,14 @@ export default function MarketProviderChart({ rows, selectedProviders, onToggleP
                       )
                   )}
                   <text
-                    x={barX + barWidth / 2}
-                    y={H - PAD.bottom + 14}
-                    text-anchor="middle"
+                    x={labelX}
+                    y={labelY}
+                    text-anchor={rotateLabels ? 'end' : 'middle'}
                     font-size="9"
                     fill="var(--color-ink-tertiary)"
+                    transform={rotateLabels ? `rotate(-40 ${labelX} ${labelY})` : undefined}
                   >
-                    {uc.length > 14 ? `${uc.slice(0, 13)}…` : uc}
+                    {truncate(uc)}
                   </text>
                 </g>
               );

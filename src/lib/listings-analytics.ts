@@ -3,7 +3,7 @@
 // RoleRow (role-rows.ts) — no title/href/description, since the dashboard
 // deals in counts and averages, not individual apply flows.
 import type { RoleWithProvider } from './role-rows';
-import { taskType, payAmount, TASK_TYPE_LABELS, type TaskType } from './role-taxonomy';
+import { taskType, payAmount, payBand, TASK_TYPE_LABELS, PAY_BAND_LABELS, type TaskType, type PayBand } from './role-taxonomy';
 
 // Known acronyms that appear in category text already-lowercase (e.g. a
 // source sending "ai-machine-learning") — title-casing alone would turn
@@ -83,12 +83,15 @@ export interface ListingAnalyticsRow {
   taskType: TaskType;
   taskTypeLabel: string;
   hourlyRate: number | null;
+  payBand: PayBand;
+  payBandLabel: string;
   payText: string | null;
   createdAt: string;
 }
 
 export function toAnalyticsRow({ role, provider }: RoleWithProvider): ListingAnalyticsRow {
   const type = taskType(role);
+  const band = payBand(role);
   return {
     id: role.id,
     providerSlug: provider.slug,
@@ -97,6 +100,8 @@ export function toAnalyticsRow({ role, provider }: RoleWithProvider): ListingAna
     taskType: type,
     taskTypeLabel: TASK_TYPE_LABELS[type],
     hourlyRate: payAmount(role),
+    payBand: band,
+    payBandLabel: PAY_BAND_LABELS[band],
     payText: role.pay_text,
     createdAt: role.first_seen_at,
   };

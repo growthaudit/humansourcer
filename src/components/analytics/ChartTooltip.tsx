@@ -1,4 +1,4 @@
-import { useRef, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import type { ComponentChildren } from 'preact';
 
 interface TooltipState {
@@ -31,6 +31,29 @@ export function useChartTooltip() {
   const hideTooltip = () => setTooltip(null);
 
   return { containerRef, tooltip, showTooltip, hideTooltip };
+}
+
+// Live pixel width of a container, via ResizeObserver — lets a chart branch
+// its label strategy (full → truncated → rotated) off the actual rendered
+// width instead of the fixed SVG viewBox, which just scales everything
+// (including text) uniformly and never actually prevents overlap.
+export function useContainerWidth<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  const [width, setWidth] = useState(0);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width;
+      if (w) setWidth(w);
+    });
+    observer.observe(el);
+    setWidth(el.getBoundingClientRect().width);
+    return () => observer.disconnect();
+  }, []);
+
+  return { ref, width };
 }
 
 export function ChartTooltip({ tooltip }: { tooltip: TooltipState | null }) {

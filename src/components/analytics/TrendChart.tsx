@@ -56,7 +56,14 @@ export default function TrendChart({ rows, selectedTaskTypes, onToggleTaskType }
 
     const seriesData = seriesKeys.map((key) => ({
       key,
-      label: key === OTHER_KEY ? 'Other' : TASK_TYPE_LABELS[key as TaskType],
+      // "Other use cases" (not "Other"/"Uncategorized") — this is a distinct
+      // synthetic top-N overflow bucket, not the real 'other' taxonomy
+      // value, which has its own label and may itself appear as one of the
+      // top-N lines above. A line chart can't spare a 9th color for every
+      // use case (palette.ts is a fixed 8-hue set, deliberately never
+      // cycled), so this chart keeps top-N+Other while every other chart on
+      // this page shows all 9 use cases directly.
+      label: key === OTHER_KEY ? 'Other use cases' : TASK_TYPE_LABELS[key as TaskType],
       values: allWeeks.map((wk) => byWeekAndSeries.get(wk)?.get(key) ?? 0),
     }));
 

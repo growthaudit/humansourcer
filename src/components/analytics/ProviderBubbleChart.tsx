@@ -68,13 +68,11 @@ export default function ProviderBubbleChart({ rows, selectedProviders, onToggleP
   const x = (t: number) => PAD.left + MAX_R + t * (plotW - 2 * MAX_R);
   const y = (pay: number) => PAD.top + MAX_R + (1 - pay / maxPay) * (plotH - 2 * MAX_R);
 
-  const labeled = new Set(
-    points
-      .slice()
-      .sort((a, b) => b.count - a.count)
-      .slice(0, LABEL_COUNT)
-      .map((p) => p.slug)
-  );
+  const labeledList = points
+    .slice()
+    .sort((a, b) => b.count - a.count)
+    .slice(0, LABEL_COUNT);
+  const labeledRank = new Map(labeledList.map((p, i) => [p.slug, i + 1]));
 
   return (
     <div ref={containerRef} class="relative rounded-lg border border-border bg-surface p-4">
@@ -138,22 +136,53 @@ export default function ProviderBubbleChart({ rows, selectedProviders, onToggleP
                   onMouseLeave={hideTooltip}
                   onClick={() => onToggleProvider(p.slug)}
                 />
-                {labeled.has(p.slug) && (
-                  <text
-                    x={x(p.transparency)}
-                    y={y(p.avgPay) - r(p.count) - 4}
-                    text-anchor="middle"
-                    font-size="10"
-                    fill="var(--color-ink-secondary)"
-                  >
-                    {p.brand}
-                  </text>
+                {labeledRank.has(p.slug) && (
+                  <g>
+                    <circle
+                      cx={x(p.transparency)}
+                      cy={y(p.avgPay) - r(p.count) - 8}
+                      r="8"
+                      fill="var(--color-accent)"
+                      stroke="var(--color-surface)"
+                      stroke-width="1.5"
+                    />
+                    <text
+                      x={x(p.transparency)}
+                      y={y(p.avgPay) - r(p.count) - 8}
+                      text-anchor="middle"
+                      dominant-baseline="central"
+                      font-size="9"
+                      font-weight="600"
+                      fill="var(--color-accent-ink)"
+                    >
+                      {labeledRank.get(p.slug)}
+                    </text>
+                  </g>
                 )}
               </g>
             ))}
           </svg>
         )}
       </div>
+      {labeledList.length > 0 && (
+        <div class="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-xs">
+          {labeledList.map((p, i) => (
+            <button
+              type="button"
+              onClick={() => onToggleProvider(p.slug)}
+              class={`flex items-center gap-1.5 rounded px-1.5 py-0.5 transition-colors duration-200 ease-out hover:bg-surface-raised ${
+                selectedProviders.includes(p.slug) ? 'bg-accent-soft text-ink-primary' : 'text-ink-secondary'
+              }`}
+            >
+              <span class="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-accent text-[9px] font-semibold text-accent-ink">
+                {i + 1}
+              </span>
+              {p.brand}
+              <span class="text-ink-tertiary">({p.count})</span>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

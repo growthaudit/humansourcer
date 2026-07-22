@@ -197,7 +197,7 @@ export const TASK_TYPE_LABELS: Record<TaskType, string> = {
   'research-analysis': 'Research / analysis',
   'translation-linguistics': 'Translation / linguistics',
   'customer-support-ops': 'Customer support / ops',
-  other: 'Other',
+  other: 'Uncategorized',
 };
 
 export const LOCATION_BUCKET_LABELS: Record<LocationBucket, string> = {
