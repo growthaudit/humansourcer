@@ -33,6 +33,12 @@ const scrapers = [
   'scrape-dataforce-community.mjs',
   'scrape-dataforce-jobs.mjs',
   'scrape-welo-data.mjs',
+  'scrape-outlier.mjs',
+  'scrape-crowdgen.mjs',
+  'scrape-humansignal.mjs',
+  'scrape-shaip.mjs',
+  'scrape-datamundi.mjs',
+  'scrape-stellar.mjs',
 ];
 
 let failures = 0;
