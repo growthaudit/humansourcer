@@ -58,7 +58,9 @@ const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
             href="/"
             class={`transition-colors duration-200 ease-out ${
               Astro.url.pathname === '/' ||
-              (Astro.url.pathname.startsWith('/providers') && !Astro.url.pathname.startsWith('/providers/gig'))
+              (Astro.url.pathname.startsWith('/providers') &&
+                !Astro.url.pathname.startsWith('/providers/gig') &&
+                !Astro.url.pathname.startsWith('/providers/compare'))
                 ? 'font-semibold text-ink-primary'
                 : 'hover:text-ink-primary'
             }`}
@@ -74,6 +76,16 @@ const jsonLdBlocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
             }`}
           >
             Gig
+          </a>
+          <a
+            href="/providers/compare/"
+            class={`transition-colors duration-200 ease-out ${
+              Astro.url.pathname.startsWith('/providers/compare')
+                ? 'font-semibold text-ink-primary'
+                : 'hover:text-ink-primary'
+            }`}
+          >
+            Compare
           </a>
           <a
             href="/roles/"

@@ -1,0 +1,66 @@
+---
+// Index/hub for every curated comparison page — the entry point that makes
+// each /providers/compare/[pair]/ page reachable by internal crawl from
+// /providers/, not just from an individual provider's detail page. See
+// src/data/comparisons.json for how pairs are curated (small, hand-reviewed
+// batches, never the full combinatorial set).
+import Layout from '../../../layouts/Layout.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import { getCollection } from 'astro:content';
+import { breadcrumbListJsonLd, itemListJsonLd } from '../../../lib/jsonld';
+import comparisons from '../../../data/comparisons.json';
+
+const providers = await getCollection('providers');
+const bySlug = new Map(providers.map((p) => [p.data.slug, p.data]));
+
+const entries = comparisons.map((entry) => {
+  const providerA = bySlug.get(entry.slugA);
+  const providerB = bySlug.get(entry.slugB);
+  if (!providerA || !providerB) {
+    throw new Error(`comparisons.json references an unknown provider slug: ${entry.slugA} or ${entry.slugB}`);
+  }
+  return {
+    href: `/providers/compare/${entry.slugA}-vs-${entry.slugB}/`,
+    label: `${providerA.workerBrand} vs ${providerB.workerBrand}`,
+    angle: entry.angle,
+  };
+});
+
+const canonicalPath = '/providers/compare/';
+const pageUrl = new URL(canonicalPath, Astro.site).toString();
+
+const breadcrumbItems = [
+  { name: 'Home', url: new URL('/', Astro.site).toString() },
+  { name: 'Providers', url: new URL('/providers/experts/', Astro.site).toString() },
+  { name: 'Compare', url: pageUrl },
+];
+
+const jsonLd = [
+  breadcrumbListJsonLd(breadcrumbItems),
+  itemListJsonLd(entries.map((e) => ({ name: e.label, url: new URL(e.href, Astro.site).toString() })), pageUrl),
+];
+
+const title = 'Compare AI-Training Providers | HumanSourcer';
+const description = `Side-by-side comparisons of ${entries.length} AI-training provider pairs — pay, access model, and ownership confidence, sourced and updated daily.`;
+---
+
+<Layout title={title} description={description} canonicalPath={canonicalPath} jsonLd={jsonLd}>
+  <Breadcrumbs items={breadcrumbItems} />
+  <h1 class="text-3xl font-bold tracking-tight">Compare providers</h1>
+  <p class="mt-2 max-w-2xl text-ink-secondary">
+    Side-by-side comparisons of AI-training and expert-network providers that hire for similar
+    domain work — pay, access model, and ownership confidence, sourced and updated daily.
+  </p>
+
+  <div class="mt-8 grid gap-4 sm:grid-cols-2">
+    {entries.map((entry) => (
+      <a
+        href={entry.href}
+        class="block rounded-lg border border-border p-4 transition-colors duration-200 ease-out hover:border-border-strong hover:shadow-sm"
+      >
+        <div class="font-medium text-ink-primary">{entry.label}</div>
+        <p class="mt-1 text-sm text-ink-secondary">{entry.angle}</p>
+      </a>
+    ))}
+  </div>
+</Layout>

@@ -22,7 +22,7 @@ import {
   type LocationBucket,
   type PayBand,
 } from './role-taxonomy';
-import { geographyScope, DOMAIN_TAG_LABELS } from './taxonomy';
+import { geographyScope, confidenceLevel, accessModelCategory, ACCESS_MODEL_LABELS, DOMAIN_TAG_LABELS } from './taxonomy';
 
 type Provider = CollectionEntry<'providers'>['data'];
 
@@ -116,7 +116,7 @@ function formatCompanyList(companies: string[]): string {
   return `${companies.slice(0, 6).join(', ')}, and ${companies.length - 6} more`;
 }
 
-function summarizePayBands(stats: HubStats): string {
+export function summarizePayBands(stats: HubStats): string {
   const unspecified = stats.payBandCounts.unspecified ?? 0;
   const known = stats.totalRoles - unspecified;
   if (known === 0) {
@@ -130,7 +130,7 @@ function summarizePayBands(stats: HubStats): string {
   return `Where pay is disclosed, the most common range is ${PAY_BAND_LABELS[topBand]} (${topCount} of ${stats.totalRoles} roles).${unspecifiedNote}`;
 }
 
-function summarizeLocations(stats: HubStats): string {
+export function summarizeLocations(stats: HubStats): string {
   const [topBucket, topCount] = (Object.entries(stats.locationCounts) as [LocationBucket, number][]).sort(
     (a, b) => b[1] - a[1]
   )[0];
@@ -253,5 +253,109 @@ export function companyHubFAQs(provider: Provider, stats: HubStats): FAQItem[] {
       question: `Is ${provider.workerBrand} legitimate?`,
       answer: `Ownership confidence: ${provider.ownershipConfidence} — verified via ${new URL(provider.relationshipEvidenceUrl).hostname}.`,
     },
+  ];
+}
+
+// --- Comparison pages ------------------------------------------------------
+
+// Objective ordering derived from the existing confidenceLevel() taxonomy
+// enum — never an invented opinion about which provider is "more trustworthy",
+// just a comparison of the same confirmed/reported classification already
+// shown on each provider's own page.
+const CONFIDENCE_RANK: Record<ReturnType<typeof confidenceLevel>, number> = {
+  confirmed: 2,
+  high: 1,
+  medium: 0,
+};
+
+function topPayBand(stats: HubStats): [PayBand, number] | null {
+  const known = stats.totalRoles - (stats.payBandCounts.unspecified ?? 0);
+  if (known === 0) return null;
+  return (Object.entries(stats.payBandCounts) as [PayBand, number][])
+    .filter(([band]) => band !== 'unspecified')
+    .sort((a, b) => b[1] - a[1])[0];
+}
+
+const PAY_BAND_RANK: Record<PayBand, number> = {
+  unspecified: -1,
+  'project-based': 0,
+  'under-20': 1,
+  '20-40': 2,
+  '40-plus': 3,
+};
+
+function remoteShare(stats: HubStats): number {
+  return (stats.locationCounts.remote ?? 0) / stats.totalRoles;
+}
+
+// Every answer traces to a real field on the provider registry or a
+// computeHubStats() output for that provider's own currently-active roles —
+// same no-fabrication discipline as the rest of this file. Comparative
+// framing only (which has more/higher/faster), never a subjective "which is
+// better" verdict; that editorial judgment lives in the hand-written `angle`
+// field on the comparisons.json entry instead, not here.
+export function comparisonFAQs(
+  providerA: Provider,
+  statsA: HubStats,
+  providerB: Provider,
+  statsB: HubStats
+): FAQItem[] {
+  const a = providerA.workerBrand;
+  const b = providerB.workerBrand;
+
+  const roleCountAnswer =
+    statsA.totalRoles === statsB.totalRoles
+      ? `${a} and ${b} currently have the same number of open roles listed: ${statsA.totalRoles} each.`
+      : statsA.totalRoles > statsB.totalRoles
+        ? `${a} currently has more open roles: ${statsA.totalRoles} vs ${b}'s ${statsB.totalRoles}.`
+        : `${b} currently has more open roles: ${statsB.totalRoles} vs ${a}'s ${statsA.totalRoles}.`;
+
+  const remoteA = remoteShare(statsA);
+  const remoteB = remoteShare(statsB);
+  const remoteAnswer =
+    Math.round(remoteA * 100) === Math.round(remoteB * 100)
+      ? `${a} and ${b} list a similar share of remote roles (${Math.round(remoteA * 100)}% and ${Math.round(remoteB * 100)}% respectively).`
+      : remoteA > remoteB
+        ? `${a} lists a higher share of remote roles (${Math.round(remoteA * 100)}%) than ${b} (${Math.round(remoteB * 100)}%).`
+        : `${b} lists a higher share of remote roles (${Math.round(remoteB * 100)}%) than ${a} (${Math.round(remoteA * 100)}%).`;
+
+  const payA = topPayBand(statsA);
+  const payB = topPayBand(statsB);
+  const payAnswer =
+    !payA || !payB
+      ? `Pay isn't disclosed clearly enough on one or both sides to compare directly — check each role's listing for current compensation details.`
+      : PAY_BAND_RANK[payA[0]] === PAY_BAND_RANK[payB[0]]
+        ? `Where disclosed, ${a} and ${b} cluster in a similar pay range: ${PAY_BAND_LABELS[payA[0]]}.`
+        : PAY_BAND_RANK[payA[0]] > PAY_BAND_RANK[payB[0]]
+          ? `Where disclosed, ${a}'s most common pay range (${PAY_BAND_LABELS[payA[0]]}) is higher than ${b}'s (${PAY_BAND_LABELS[payB[0]]}).`
+          : `Where disclosed, ${b}'s most common pay range (${PAY_BAND_LABELS[payB[0]]}) is higher than ${a}'s (${PAY_BAND_LABELS[payA[0]]}).`;
+
+  const confA = confidenceLevel(providerA.ownershipConfidence);
+  const confB = confidenceLevel(providerB.ownershipConfidence);
+  const confidenceAnswer =
+    CONFIDENCE_RANK[confA] === CONFIDENCE_RANK[confB]
+      ? `${a} and ${b} carry the same ownership-confidence rating: ${confA}, verified via ${new URL(providerA.relationshipEvidenceUrl).hostname} and ${new URL(providerB.relationshipEvidenceUrl).hostname} respectively.`
+      : `${CONFIDENCE_RANK[confA] > CONFIDENCE_RANK[confB] ? a : b}'s ownership is rated with higher confidence (${CONFIDENCE_RANK[confA] > CONFIDENCE_RANK[confB] ? confA : confB}) than ${CONFIDENCE_RANK[confA] > CONFIDENCE_RANK[confB] ? b : a}'s (${CONFIDENCE_RANK[confA] > CONFIDENCE_RANK[confB] ? confB : confA}).`;
+
+  const sharedTags = providerA.domainTags.filter((t) => providerB.domainTags.includes(t));
+  const domainAnswer =
+    sharedTags.length === 0
+      ? `${a} and ${b} don't share any domain tags — ${a} covers ${providerA.domainTags.map((t) => DOMAIN_TAG_LABELS[t] ?? t).join(', ')}, while ${b} covers ${providerB.domainTags.map((t) => DOMAIN_TAG_LABELS[t] ?? t).join(', ')}.`
+      : `Yes — both hire for ${sharedTags.map((t) => DOMAIN_TAG_LABELS[t] ?? t).join(', ')}. ${a} additionally covers ${providerA.domainTags.filter((t) => !sharedTags.includes(t)).map((t) => DOMAIN_TAG_LABELS[t] ?? t).join(', ') || 'nothing else'}; ${b} additionally covers ${providerB.domainTags.filter((t) => !sharedTags.includes(t)).map((t) => DOMAIN_TAG_LABELS[t] ?? t).join(', ') || 'nothing else'}.`;
+
+  const accessA = ACCESS_MODEL_LABELS[accessModelCategory(providerA.accessModel)];
+  const accessB = ACCESS_MODEL_LABELS[accessModelCategory(providerB.accessModel)];
+  const accessAnswer =
+    accessA === accessB
+      ? `${a} and ${b} share the same broad access model: ${accessA}.`
+      : `${a}'s access model is "${accessA}" (${providerA.accessModel}); ${b}'s is "${accessB}" (${providerB.accessModel}).`;
+
+  return [
+    { question: `${a} vs ${b}: which has more open roles right now?`, answer: roleCountAnswer },
+    { question: `Is ${a} or ${b} more remote-friendly?`, answer: remoteAnswer },
+    { question: `Which pays more, ${a} or ${b}?`, answer: payAnswer },
+    { question: `Which has higher ownership confidence, ${a} or ${b}?`, answer: confidenceAnswer },
+    { question: `Do ${a} and ${b} overlap in what they hire for?`, answer: domainAnswer },
+    { question: `What's the difference between ${a} and ${b}'s access model?`, answer: accessAnswer },
   ];
 }

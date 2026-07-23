@@ -1,0 +1,32 @@
+[
+  {
+    "slugA": "human-frontier-collective-hfc",
+    "slugB": "mercor-experts",
+    "angle": "Both are selective-application expert networks overlapping in law, medicine, and finance work, but HFC is Scale AI's fellowship-style network with roles concentrated in the US, UK, and Canada, while Mercor Experts is open globally, spans a broader set of domains including coding and consulting/ops, and currently lists far more active roles.",
+    "addedAt": "2026-07-23"
+  },
+  {
+    "slugA": "human-frontier-collective-hfc",
+    "slugB": "meridial",
+    "angle": "HFC and Meridial share law, finance, and science/STEM work, but Meridial (an Invisible Technologies-powered contractor network) covers a wider domain spread including coding, linguistics, and safety, and lists a much larger volume of open roles than HFC's smaller, region-limited fellowship network.",
+    "addedAt": "2026-07-23"
+  },
+  {
+    "slugA": "human-frontier-collective-hfc",
+    "slugB": "vetto-opportunities",
+    "angle": "HFC and Vetto Opportunities both hire selectively for medicine and finance domain work, but sit under different parent companies (Scale AI vs. Vetto) with different secondary focuses — HFC also covers law and science/STEM, while Vetto also covers consulting/ops — and both currently have a comparatively small number of open roles.",
+    "addedAt": "2026-07-23"
+  },
+  {
+    "slugA": "mercor-experts",
+    "slugB": "meridial",
+    "angle": "Mercor Experts and Meridial are two of the largest expert networks by open-role volume, overlapping in law, finance, and coding work, which makes the choice between Mercor's profile/role application model and Meridial's Invisible-powered contractor network one of the more common comparisons for workers weighing where to apply first.",
+    "addedAt": "2026-07-23"
+  },
+  {
+    "slugA": "mercor-experts",
+    "slugB": "vetto-opportunities",
+    "angle": "Mercor Experts and Vetto Opportunities both hire for medicine, finance, and consulting/ops work, but Mercor currently lists a much larger volume of open roles across a broader domain set, while Vetto's opportunities are narrower and more limited in number at any given time.",
+    "addedAt": "2026-07-23"
+  }
+]

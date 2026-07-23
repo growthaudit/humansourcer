@@ -19,6 +19,7 @@ import type { CollectionEntry } from 'astro:content';
 interface Props {
   provider: CollectionEntry<'providers'>;
   providerRoles: ProviderRoles;
+  comparedWith: { workerBrand: string; href: string }[];
   backHref: string;
   backLabel: string;
   ctaLabel: string;
@@ -26,7 +27,7 @@ interface Props {
   showRoles: boolean;
 }
 
-const { provider, providerRoles, backHref, backLabel, ctaLabel, ctaRel, showRoles }: Props = Astro.props;
+const { provider, providerRoles, comparedWith, backHref, backLabel, ctaLabel, ctaRel, showRoles }: Props = Astro.props;
 const { roles, totalCount } = providerRoles;
 const p = provider.data;
 
@@ -86,6 +87,19 @@ const confidence = confidenceLevel(p.ownershipConfidence);
     ))}
   </div>
 </div>
+
+{comparedWith.length > 0 && (
+  <div class="mt-6">
+    <h2 class="text-sm uppercase tracking-wide text-ink-tertiary">Compared with</h2>
+    <div class="mt-2 flex flex-wrap gap-2">
+      {comparedWith.map((c) => (
+        <a href={c.href} class="rounded bg-surface-raised px-3 py-1.5 text-sm text-ink-secondary transition-colors duration-200 ease-out hover:text-ink-primary">
+          vs {c.workerBrand} &rarr;
+        </a>
+      ))}
+    </div>
+  </div>
+)}
 
 {p.notes && (
   <div class="mt-6">

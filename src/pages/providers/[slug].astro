@@ -12,6 +12,7 @@ import { tierListingHref } from '../../lib/provider-url';
 import type { AudienceTier } from '../../components/ProviderFilter';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import ProviderDetail from '../../components/ProviderDetail.astro';
+import comparisons from '../../data/comparisons.json';
 
 const TIER_FRAMING: Record<
   AudienceTier,
@@ -43,21 +44,42 @@ const TIER_FRAMING: Record<
 export async function getStaticPaths() {
   const all = await getCollection('providers');
   const rolesByProvider = await getActiveRolesByProvider();
-  return all.map((provider) => ({
-    params: { slug: provider.data.slug },
-    props: {
-      provider,
-      providerRoles: rolesByProvider.get(provider.data.slug) ?? { roles: [], totalCount: 0 },
-    },
-  }));
+  const bySlug = new Map(all.map((p) => [p.data.slug, p.data]));
+
+  return all.map((provider) => {
+    const slug = provider.data.slug;
+    // Reverse lookup: any comparisons.json entry naming this provider on
+    // either side. Small curated list (see that file's header comment), so a
+    // linear scan per provider at build time is negligible.
+    const comparedWith = comparisons
+      .filter((c) => c.slugA === slug || c.slugB === slug)
+      .map((c) => {
+        const otherSlug = c.slugA === slug ? c.slugB : c.slugA;
+        const other = bySlug.get(otherSlug);
+        return other
+          ? { workerBrand: other.workerBrand, href: `/providers/compare/${c.slugA}-vs-${c.slugB}/` }
+          : null;
+      })
+      .filter((x): x is { workerBrand: string; href: string } => x !== null);
+
+    return {
+      params: { slug },
+      props: {
+        provider,
+        providerRoles: rolesByProvider.get(slug) ?? { roles: [], totalCount: 0 },
+        comparedWith,
+      },
+    };
+  });
 }
 
 interface Props {
   provider: CollectionEntry<'providers'>;
   providerRoles: ProviderRoles;
+  comparedWith: { workerBrand: string; href: string }[];
 }
 
-const { provider, providerRoles }: Props = Astro.props;
+const { provider, providerRoles, comparedWith }: Props = Astro.props;
 const p = provider.data;
 const tier = p.audienceTiers[0];
 const framing = TIER_FRAMING[tier];
@@ -85,6 +107,7 @@ const description =
   <ProviderDetail
     provider={provider}
     providerRoles={providerRoles}
+    comparedWith={comparedWith}
     backHref={tierListingHref(tier)}
     backLabel={framing.backLabel}
     ctaLabel={framing.ctaLabel(p.workerBrand)}

@@ -1,0 +1,234 @@
+---
+// One static page per curated provider pair, sourced from
+// src/data/comparisons.json — never combinatorially generated (see the
+// "Never generate the full combinatorial set" note in that file's sibling
+// docs/keyword-opportunities.md write-up). Pair ordering (slugA/slugB) is
+// fixed in the data file, not derived at request time, so exactly one page
+// exists per pair and a reversed URL (e.g. b-vs-a when the canonical page is
+// a-vs-b) simply 404s rather than needing redirect infrastructure.
+import Layout from '../../../../layouts/Layout.astro';
+import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
+import FAQ from '../../../../components/FAQ.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { getEligibleActiveRoles, groupByCompany } from '../../../../lib/role-rows';
+import { computeHubStats, comparisonFAQs, summarizePayBands, summarizeLocations, type HubStats } from '../../../../lib/role-faq';
+import {
+  accessModelCategory,
+  geographyScope,
+  statusCategory,
+  confidenceLevel,
+  ACCESS_MODEL_LABELS,
+  GEOGRAPHY_LABELS,
+  STATUS_LABELS,
+  DOMAIN_TAG_LABELS,
+} from '../../../../lib/taxonomy';
+import { breadcrumbListJsonLd, faqPageJsonLd, itemListJsonLd } from '../../../../lib/jsonld';
+import { providerHref } from '../../../../lib/provider-url';
+import comparisons from '../../../../data/comparisons.json';
+
+type Provider = CollectionEntry<'providers'>['data'];
+
+export async function getStaticPaths() {
+  const providers = await getCollection('providers');
+  const bySlug = new Map(providers.map((p) => [p.data.slug, p.data]));
+  const eligible = await getEligibleActiveRoles();
+  const byCompany = groupByCompany(eligible);
+
+  return comparisons.map((entry) => {
+    const providerA = bySlug.get(entry.slugA);
+    const providerB = bySlug.get(entry.slugB);
+    if (!providerA || !providerB) {
+      throw new Error(`comparisons.json references an unknown provider slug: ${entry.slugA} or ${entry.slugB}`);
+    }
+    const statsA = computeHubStats(byCompany.get(entry.slugA) ?? []);
+    const statsB = computeHubStats(byCompany.get(entry.slugB) ?? []);
+    return {
+      params: { pair: `${entry.slugA}-vs-${entry.slugB}` },
+      props: { providerA, providerB, statsA, statsB, angle: entry.angle },
+    };
+  });
+}
+
+interface Props {
+  providerA: Provider;
+  providerB: Provider;
+  statsA: HubStats;
+  statsB: HubStats;
+  angle: string;
+}
+
+const { providerA, providerB, statsA, statsB, angle }: Props = Astro.props;
+const { pair } = Astro.params;
+
+const accessA = accessModelCategory(providerA.accessModel);
+const accessB = accessModelCategory(providerB.accessModel);
+const geoA = geographyScope(providerA.geography);
+const geoB = geographyScope(providerB.geography);
+const statusA = statusCategory(providerA.status);
+const statusB = statusCategory(providerB.status);
+const confA = confidenceLevel(providerA.ownershipConfidence);
+const confB = confidenceLevel(providerB.ownershipConfidence);
+const sharedDomainTags = providerA.domainTags.filter((t) => providerB.domainTags.includes(t));
+
+const faqs = comparisonFAQs(providerA, statsA, providerB, statsB);
+
+const canonicalPath = `/providers/compare/${pair}/`;
+const pageUrl = new URL(canonicalPath, Astro.site).toString();
+const providerAUrl = new URL(providerHref(providerA), Astro.site).toString();
+const providerBUrl = new URL(providerHref(providerB), Astro.site).toString();
+
+const breadcrumbItems = [
+  { name: 'Home', url: new URL('/', Astro.site).toString() },
+  { name: 'Providers', url: new URL('/providers/experts/', Astro.site).toString() },
+  { name: 'Compare', url: new URL('/providers/compare/', Astro.site).toString() },
+  { name: `${providerA.workerBrand} vs ${providerB.workerBrand}`, url: pageUrl },
+];
+
+const jsonLd = [
+  breadcrumbListJsonLd(breadcrumbItems),
+  faqPageJsonLd(faqs),
+  itemListJsonLd(
+    [
+      { name: providerA.workerBrand, url: providerAUrl },
+      { name: providerB.workerBrand, url: providerBUrl },
+    ],
+    pageUrl
+  ),
+];
+
+const title = `${providerA.workerBrand} vs ${providerB.workerBrand}: Pay, Access & Legitimacy Compared | HumanSourcer`;
+const description = `Compare ${providerA.workerBrand} and ${providerB.workerBrand}: ${statsA.totalRoles} vs ${statsB.totalRoles} open roles, pay, access model, and ownership confidence — sourced and updated daily.`;
+---
+
+<Layout title={title} description={description} canonicalPath={canonicalPath} jsonLd={jsonLd}>
+  <Breadcrumbs items={breadcrumbItems} />
+  <h1 class="text-3xl font-bold tracking-tight">{providerA.workerBrand} vs {providerB.workerBrand}</h1>
+  <p class="mt-4 max-w-2xl text-ink-secondary">{angle}</p>
+
+  <div class="mt-8 overflow-x-auto">
+    <table class="w-full min-w-[560px] border-collapse text-sm">
+      <thead>
+        <tr class="border-b border-border text-left">
+          <th class="py-2 pr-4 font-medium text-ink-tertiary">Field</th>
+          <th class="py-2 pr-4 font-medium text-ink-primary">{providerA.workerBrand}</th>
+          <th class="py-2 font-medium text-ink-primary">{providerB.workerBrand}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b border-border">
+          <td class="py-2 pr-4 text-ink-tertiary">Parent company</td>
+          <td class="py-2 pr-4">{providerA.parentGroup}</td>
+          <td class="py-2">{providerB.parentGroup}</td>
+        </tr>
+        <tr class="border-b border-border">
+          <td class="py-2 pr-4 text-ink-tertiary">Relationship</td>
+          <td class="py-2 pr-4">{providerA.relationship}</td>
+          <td class="py-2">{providerB.relationship}</td>
+        </tr>
+        <tr class="border-b border-border">
+          <td class="py-2 pr-4 text-ink-tertiary">Portal type</td>
+          <td class="py-2 pr-4">{providerA.portalType}</td>
+          <td class="py-2">{providerB.portalType}</td>
+        </tr>
+        <tr class="border-b border-border">
+          <td class="py-2 pr-4 text-ink-tertiary">Access model</td>
+          <td class="py-2 pr-4">{ACCESS_MODEL_LABELS[accessA]}</td>
+          <td class="py-2">{ACCESS_MODEL_LABELS[accessB]}</td>
+        </tr>
+        <tr class="border-b border-border">
+          <td class="py-2 pr-4 text-ink-tertiary">Geography</td>
+          <td class="py-2 pr-4">{GEOGRAPHY_LABELS[geoA]}</td>
+          <td class="py-2">{GEOGRAPHY_LABELS[geoB]}</td>
+        </tr>
+        <tr class="border-b border-border">
+          <td class="py-2 pr-4 text-ink-tertiary">Status</td>
+          <td class="py-2 pr-4">{STATUS_LABELS[statusA]}</td>
+          <td class="py-2">{STATUS_LABELS[statusB]}</td>
+        </tr>
+        <tr class="border-b border-border">
+          <td class="py-2 pr-4 text-ink-tertiary">Ownership confidence</td>
+          <td class="py-2 pr-4 capitalize">{confA}</td>
+          <td class="py-2 capitalize">{confB}</td>
+        </tr>
+        <tr class="border-b border-border">
+          <td class="py-2 pr-4 text-ink-tertiary">Domains</td>
+          <td class="py-2 pr-4">
+            <div class="flex flex-wrap gap-1">
+              {providerA.domainTags.map((tag) => (
+                <span class={`rounded px-2 py-0.5 text-xs ${sharedDomainTags.includes(tag) ? 'bg-accent/20 text-ink-primary font-medium' : 'bg-surface-raised text-ink-secondary'}`}>
+                  {DOMAIN_TAG_LABELS[tag] ?? tag}
+                </span>
+              ))}
+            </div>
+          </td>
+          <td class="py-2">
+            <div class="flex flex-wrap gap-1">
+              {providerB.domainTags.map((tag) => (
+                <span class={`rounded px-2 py-0.5 text-xs ${sharedDomainTags.includes(tag) ? 'bg-accent/20 text-ink-primary font-medium' : 'bg-surface-raised text-ink-secondary'}`}>
+                  {DOMAIN_TAG_LABELS[tag] ?? tag}
+                </span>
+              ))}
+            </div>
+          </td>
+        </tr>
+        <tr class="border-b border-border">
+          <td class="py-2 pr-4 text-ink-tertiary">Open roles</td>
+          <td class="py-2 pr-4">{statsA.totalRoles}</td>
+          <td class="py-2">{statsB.totalRoles}</td>
+        </tr>
+        <tr class="border-b border-border">
+          <td class="py-2 pr-4 text-ink-tertiary">Pay</td>
+          <td class="py-2 pr-4">{summarizePayBands(statsA)}</td>
+          <td class="py-2">{summarizePayBands(statsB)}</td>
+        </tr>
+        <tr>
+          <td class="py-2 pr-4 text-ink-tertiary">Remote / location</td>
+          <td class="py-2 pr-4">{summarizeLocations(statsA)}</td>
+          <td class="py-2">{summarizeLocations(statsB)}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <FAQ items={faqs} />
+
+  <div class="mt-10 flex flex-wrap gap-4">
+    <a href={providerHref(providerA)} class="rounded-md border border-border px-4 py-2 text-sm font-medium text-ink-primary transition-colors duration-200 ease-out hover:border-border-strong">
+      Full {providerA.workerBrand} profile &rarr;
+    </a>
+    <a href={providerHref(providerB)} class="rounded-md border border-border px-4 py-2 text-sm font-medium text-ink-primary transition-colors duration-200 ease-out hover:border-border-strong">
+      Full {providerB.workerBrand} profile &rarr;
+    </a>
+  </div>
+
+  {sharedDomainTags.length > 0 && (
+    <div class="mt-8">
+      <h2 class="text-sm uppercase tracking-wide text-ink-tertiary">Related domain hubs</h2>
+      <div class="mt-2 flex flex-wrap gap-2">
+        {sharedDomainTags.map((tag) => (
+          <a href={`/roles/domain/${tag}/`} class="rounded bg-surface-raised px-3 py-1.5 text-sm text-ink-secondary transition-colors duration-200 ease-out hover:text-ink-primary">
+            {DOMAIN_TAG_LABELS[tag] ?? tag} roles &rarr;
+          </a>
+        ))}
+      </div>
+    </div>
+  )}
+
+  <div class="mt-10 border-t border-border pt-6 text-sm text-ink-secondary">
+    <h2 class="mb-2 font-semibold text-ink-primary">Sources</h2>
+    <ul class="space-y-1">
+      <li>
+        {providerA.workerBrand} ownership/relationship: <a class="underline" href={providerA.relationshipEvidenceUrl} rel="nofollow">{providerA.relationshipEvidenceUrl}</a>
+      </li>
+      <li>
+        {providerA.workerBrand} status: <a class="underline" href={providerA.statusEvidenceUrl} rel="nofollow">{providerA.statusEvidenceUrl}</a>
+      </li>
+      <li>
+        {providerB.workerBrand} ownership/relationship: <a class="underline" href={providerB.relationshipEvidenceUrl} rel="nofollow">{providerB.relationshipEvidenceUrl}</a>
+      </li>
+      <li>
+        {providerB.workerBrand} status: <a class="underline" href={providerB.statusEvidenceUrl} rel="nofollow">{providerB.statusEvidenceUrl}</a>
+      </li>
+    </ul>
+  </div>
+</Layout>

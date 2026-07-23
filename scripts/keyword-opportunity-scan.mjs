@@ -31,7 +31,7 @@ const ALL_TASK_TYPES = Object.keys(TASK_TYPE_LABELS);
 
 async function loadEligibleRoles() {
   const providers = JSON.parse(await readFile(PROVIDERS_PATH, 'utf-8'));
-  const expertBySlug = new Map(providers.filter((p) => p.audienceTier === 'expert').map((p) => [p.slug, p]));
+  const expertBySlug = new Map(providers.filter((p) => p.audienceTiers.includes('expert')).map((p) => [p.slug, p]));
 
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -139,7 +139,7 @@ async function main() {
   const providerRoleCounts = countBy(eligible, ({ provider }) => provider.workerBrand);
   const providersWithNoRoles = expertProviders.filter((p) => !providerRoleCounts[p.workerBrand]);
 
-  const gigTierCount = providers.filter((p) => p.audienceTier === 'gig').length;
+  const gigTierCount = providers.filter((p) => p.audienceTiers.includes('gig')).length;
 
   const report = {
     generatedAt: new Date().toISOString(),
